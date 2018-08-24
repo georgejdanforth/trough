@@ -1,0 +1,5 @@
+Flask
+aiodns
+aiohttp
+cchardet
+python-dotenv
