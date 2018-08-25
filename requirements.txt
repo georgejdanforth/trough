@@ -5,3 +5,4 @@ aiodns
 aiohttp
 cchardet
 python-dotenv
+psycopg2
