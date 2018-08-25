@@ -3,6 +3,9 @@ import datetime
 
 class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MODULES = [
+        'api.userdata',
+    ]
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True

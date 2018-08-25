@@ -1,9 +1,16 @@
+import importlib
 import os
 
 from flask import Flask
 
 from api.config import DevelopmentConfig
 from api.extensions import extensions
+
+
+def import_models():
+    for finder, name, ispkg in pkgutil.iter_modules([os.getcwd()]):
+        if ispkg and os.path.isfile(os.path.join(finder.path, name, 'models.py')):
+            importlib.import_module(f'{name}.models')
 
 
 def initialize_config(app):
@@ -26,6 +33,9 @@ def create_app():
 
     initialize_config(app)
     initialize_extensions(app)
+
+    for module in app.config['MODULES']:
+        importlib.import_module(f'{module}.models')
 
     from api.userdata.views import userdata
     app.register_blueprint(userdata)
