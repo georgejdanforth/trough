@@ -1,13 +1,17 @@
 import re
 import functools
 
-from flask import request
+from flask import (
+    request,
+    Response
+)
+from http import HTTPStatus
 
 
 class StringConverters:
 
-    @classmethod
-    def camel_to_snake(cls, string):
+    @staticmethod
+    def camel_to_snake(string):
         def _join(match):
             chunk = match.group()
             if len(chunk) > 1:
@@ -21,10 +25,16 @@ class StringConverters:
             .lstrip('_')
         )
 
-    @classmethod
-    def snake_to_camel(cls, string):
+    @staticmethod
+    def snake_to_camel(string):
         words = [word for word in re.split(r'_+', string) if word]
         return words[0] + ''.join(word.title() for word in words)
+
+class Responses:
+
+    @staticmethod
+    def ok():
+        return Response(status=HTTPStatus.OK.value)
 
 
 def receives_json(func):
