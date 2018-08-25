@@ -1,12 +1,16 @@
 from flask import (
     Blueprint,
-    jsonify
+    jsonify,
+    request
 )
+
+from api.utils import receives_json
 
 
 userdata = Blueprint('userdata', __name__, url_prefix='/userdata')
 
 
-@userdata.route('/', methods=['GET'])
-def test():
-    return jsonify({'a': 1, 'b': 2})
+@userdata.route('/signup', methods=['POST'])
+@receives_json
+def create_user():
+    return jsonify(request.json_data)

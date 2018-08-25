@@ -39,8 +39,8 @@ def create_app():
     initialize_config(app)
     initialize_extensions(app)
 
-    for module in app.config['MODULES']:
-        importlib.import_module(f'{module}.models')
+    for module_name in app.config['MODULES']:
+        importlib.import_module(f'{module_name}.models')
 
     register_blueprints(app)
 
