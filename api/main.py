@@ -1,16 +1,13 @@
 import importlib
 import os
 
-from flask import Flask
+from flask import (
+    Blueprint,
+    Flask
+)
 
 from api.config import DevelopmentConfig
 from api.extensions import extensions
-
-
-def import_models():
-    for finder, name, ispkg in pkgutil.iter_modules([os.getcwd()]):
-        if ispkg and os.path.isfile(os.path.join(finder.path, name, 'models.py')):
-            importlib.import_module(f'{name}.models')
 
 
 def initialize_config(app):
@@ -27,6 +24,14 @@ def initialize_extensions(app):
             extension.init_app(app)
 
 
+def register_blueprints(app):
+    for module_name in app.config['MODULES']:
+        module = importlib.import_module(f'{module_name}.views')
+        for item in (getattr(module, attr) for attr in dir(module)):
+            if isinstance(item, Blueprint):
+                app.register_blueprint(item)
+
+
 def create_app():
 
     app = Flask(__name__)
@@ -37,7 +42,6 @@ def create_app():
     for module in app.config['MODULES']:
         importlib.import_module(f'{module}.models')
 
-    from api.userdata.views import userdata
-    app.register_blueprint(userdata)
+    register_blueprints(app)
 
     return app
