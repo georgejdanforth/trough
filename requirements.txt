@@ -1,5 +1,6 @@
 Flask
 Flask-Bcrypt
+Flask-JWT-Extended
 Flask-Migrate
 Flask-SQLAlchemy
 aiodns

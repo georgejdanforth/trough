@@ -2,6 +2,7 @@ import re
 import functools
 
 from flask import (
+    json,
     request,
     Response
 )
@@ -28,13 +29,36 @@ class StringConverters:
     @staticmethod
     def snake_to_camel(string):
         words = [word for word in re.split(r'_+', string) if word]
-        return words[0] + ''.join(word.title() for word in words)
+        return words[0] + ''.join(word.title() for word in words[1:])
 
 class Responses:
 
     @staticmethod
     def ok():
         return Response(status=HTTPStatus.OK.value)
+
+    @staticmethod
+    def json_response(data, status_code):
+        response_json = json.dumps({
+            StringConverters.snake_to_camel(key)
+            if isinstance(key, str)
+            else key: value
+            for key, value in data.items()
+        })
+
+        return Response(
+            response_json,
+            status=status_code,
+            mimetype='application/json'
+        )
+
+    @staticmethod
+    def error(message, status_code):
+        return Response(
+            json.dumps({'error': message}),
+            status=status_code,
+            mimetype='application/json'
+        )
 
 
 def receives_json(func):
