@@ -24,3 +24,12 @@ class User(BaseModel):
             .generate_password_hash(self.password)
             .decode('utf-8')
         )
+
+
+class JsonWebToken(BaseModel):
+
+    jti = db.Column(db.String(36), nullable=False)
+    token_type = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    blacklisted = db.Column(db.Boolean, nullable=False, default=False)
+    expires = db.Column(db.DateTime, nullable=False)

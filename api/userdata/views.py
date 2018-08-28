@@ -5,7 +5,9 @@ from flask import (
 )
 from flask_jwt_extended import (
     create_access_token,
-    create_refresh_token
+    create_refresh_token,
+    get_raw_jwt,
+    jwt_required
 )
 from http import HTTPStatus
 
@@ -14,6 +16,7 @@ from api.extensions import (
     db
 )
 from api.userdata.models import User
+from api.userdata.utils import store_token
 from api.utils import (
     receives_json,
     Responses
@@ -55,6 +58,9 @@ def login():
 
     access_token = create_access_token(user)
     refresh_token = create_refresh_token(user)
+
+    store_token(access_token)
+    store_token(refresh_token)
 
     return Responses.json_response(
         {'access_token': access_token, 'refresh_token': refresh_token},

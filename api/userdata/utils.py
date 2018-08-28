@@ -1,11 +1,14 @@
 import datetime
 
 from flask_jwt_extended import decode_token
+from sqlalchemy.orm.exc import NoResultFound
 
 from api.extensions import (
     db,
     jwt
 )
+from api.userdata.models import JsonWebToken
+from api.userdata.types import TokenType
 
 
 @jwt.user_identity_loader
@@ -22,5 +25,33 @@ def set_token_claims(user):
 
 
 @jwt.token_in_blacklist_loader
-def is_token_blacklisted(decrypted_token):
-    return False
+def is_token_blacklisted(decoded_token):
+    try:
+        return (
+            JsonWebToken
+            .query
+            .filter_by(jti=decoded_token['jti'])
+            .one()
+            .blacklisted
+        )
+    except NoResultFound:
+        return True
+
+
+def store_token(encoded_token):
+    decoded_token = decode_token(encoded_token)
+    token_type = {
+        'access': TokenType.access_token.value,
+        'refresh': TokenType.refresh_token.value
+    }.get(decoded_token['type'])
+    expires = datetime.datetime.fromtimestamp(decoded_token['exp'])
+
+    token_object = JsonWebToken(
+        jti=decoded_token['jti'],
+        token_type=token_type,
+        user_id=int(decoded_token['identity']),
+        expires=expires
+    )
+
+    db.session.add(token_object)
+    db.session.commit()
