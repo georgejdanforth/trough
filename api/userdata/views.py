@@ -3,10 +3,13 @@ from flask import (
     jsonify,
     request
 )
+from flask_cors import cross_origin
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
+    get_jwt_identity,
     get_raw_jwt,
+    jwt_refresh_token_required,
     jwt_required
 )
 from http import HTTPStatus
@@ -27,6 +30,7 @@ userdata = Blueprint('userdata', __name__, url_prefix='/userdata')
 
 
 @userdata.route('/signup', methods=['POST'])
+@cross_origin()
 @receives_json
 def create_user():
     user = User(**request.json_data)
@@ -37,6 +41,7 @@ def create_user():
 
 
 @userdata.route('/login', methods=['POST'])
+@cross_origin()
 @receives_json
 def login():
     email = request.json_data.get('email')
@@ -64,5 +69,18 @@ def login():
 
     return Responses.json_response(
         {'access_token': access_token, 'refresh_token': refresh_token},
+        HTTPStatus.OK.value
+    )
+
+
+@userdata.route('refresh_token', methods=['POST'])
+@cross_origin()
+@jwt_refresh_token_required
+def refresh_token():
+    user = User.query.filter_by(id=get_jwt_identity()).one()
+    access_token = create_access_token(user)
+    store_token(access_token)
+    return Responses.json_response(
+        {'access_token': access_token},
         HTTPStatus.OK.value
     )
