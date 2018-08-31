@@ -19,7 +19,11 @@ from api.extensions import (
     db
 )
 from api.userdata.models import User
-from api.userdata.utils import store_token
+from api.userdata.utils import (
+    blacklist_token,
+    store_token,
+    TokenNotFound
+)
 from api.utils import (
     receives_json,
     Responses
@@ -73,10 +77,10 @@ def login():
     )
 
 
-@userdata.route('refresh_token', methods=['POST'])
+@userdata.route('/refresh_access_token', methods=['POST'])
 @cross_origin()
 @jwt_refresh_token_required
-def refresh_token():
+def refresh_access_token():
     user = User.query.filter_by(id=get_jwt_identity()).one()
     access_token = create_access_token(user)
     store_token(access_token)
@@ -84,3 +88,19 @@ def refresh_token():
         {'access_token': access_token},
         HTTPStatus.OK.value
     )
+
+
+@userdata.route('/logout', methods=['PUT'])
+@cross_origin()
+@jwt_required
+def logout():
+    jti = get_raw_jwt().get('jti', '')
+    user_id = get_jwt_identity()
+    try:
+        blacklist_token(jti, user_id)
+        return Responses.ok()
+    except TokenNotFound:
+        return Responses.error(
+            f'Token not found with JTI: {jti}',
+            HTTPStatus.NOT_FOUND.value
+        )

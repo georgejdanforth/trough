@@ -11,6 +11,10 @@ from api.userdata.models import JsonWebToken
 from api.userdata.types import TokenType
 
 
+class TokenNotFound(Exception):
+    pass
+
+
 @jwt.user_identity_loader
 def set_token_identity(user):
     return user.id
@@ -44,7 +48,7 @@ def store_token(encoded_token):
         'access': TokenType.access_token.value,
         'refresh': TokenType.refresh_token.value
     }.get(decoded_token['type'])
-    expires = datetime.datetime.fromtimestamp(decoded_token['exp'])
+    expires = datetime.datetime.utcfromtimestamp(decoded_token['exp'])
 
     token_object = JsonWebToken(
         jti=decoded_token['jti'],
@@ -55,3 +59,28 @@ def store_token(encoded_token):
 
     db.session.add(token_object)
     db.session.commit()
+
+
+def blacklist_token(jti, user_id):
+    try:
+        token_object = (
+            JsonWebToken
+            .query
+            .filter_by(jti=jti, user_id=user_id)
+            .one()
+        )
+        token_object.blacklisted = True
+        db.session.commit()
+    except NoResultFound:
+        raise TokenNotFound
+
+
+def cleanup_expired_tokens():
+    num_items_deleted = (
+        JsonWebToken
+        .query
+        .filter(JsonWebToken.expires > datetime.datetime.utcnow)
+        .delete()
+    )
+    db.session.commit()
+    print(f'{num_items_deleted} tokens deleted.')
