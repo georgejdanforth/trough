@@ -8,6 +8,7 @@ class BaseConfig:
 
     MODULES = [
         'api.userdata',
+        'api.feeds',
     ]
 
 class DevelopmentConfig(BaseConfig):

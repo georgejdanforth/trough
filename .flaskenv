@@ -1,2 +1,2 @@
-export FLASK_APP=$HOME/trough/api/main.py
+export FLASK_APP=api/main.py
 export FLASK_ENV=development
