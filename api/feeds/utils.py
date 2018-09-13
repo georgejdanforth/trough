@@ -30,8 +30,7 @@ class FeedParser:
                 f'Bad response {feed_response.status_code} for URL: {feed_url}'
             )
 
-        self.feed_url = feed_url
-        self.clean_feed_url = self._clean_url(feed_url)
+        self.feed_url = self._clean_url(feed_url)
         self.feed_element = self._clean_namespaces(feed_response.content.decode('utf-8'))
         self.feed_type = self._classify_feed_type()
 
@@ -55,7 +54,10 @@ class FeedParser:
         if not self._metadata:
             self._metadata = self._parse_metadata()
 
-        return self._metadata
+        return {
+            **self._metadata,
+            **{'feed_url': self.feed_url, 'feed_type': self.feed_type}
+        }
 
 
     def _classify_feed_type(self):
@@ -93,11 +95,11 @@ class FeedParser:
 
 
 def get_or_create_feed(url):
-    feed_url = clean_url(url)
+    feed_parser = FeedParser(url)
     try:
-        return Feed.query.filter_by(feed_url=feed_url).one()
+        return Feed.query.filter_by(feed_url=feed_parser.feed_url).one()
     except NoResultFound:
-        feed = feed(**parse_feed(feed_url))
+        feed = Feed(**feed_parser.metadata)
         db.session.add(feed)
         db.session.commit()
         return feed
