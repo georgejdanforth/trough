@@ -6,6 +6,7 @@ from flask import (
     Flask
 )
 
+from api.commands import commands
 from api.config import DevelopmentConfig
 from api.extensions import extensions
 from api.userdata import utils
@@ -33,6 +34,11 @@ def register_blueprints(app):
                 app.register_blueprint(item)
 
 
+def add_commands(app):
+    for command in commands:
+        app.cli.add_command(command)
+
+
 def create_app():
 
     app = Flask(__name__)
@@ -44,5 +50,6 @@ def create_app():
         importlib.import_module(f'{module_name}.models')
 
     register_blueprints(app)
+    add_commands(app)
 
     return app

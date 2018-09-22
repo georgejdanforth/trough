@@ -1,4 +1,7 @@
+import asyncio
+import aiohttp
 import dateparser
+import datetime
 import re
 import requests
 
@@ -8,7 +11,11 @@ from sqlalchemy.orm.exc import NoResultFound
 from xml.etree import ElementTree
 
 from api.extensions import db
-from api.feeds.models import Feed
+from api.feeds import constants
+from api.feeds.models import (
+    Feed,
+    FeedItem
+)
 from api.feeds.types import FeedType
 
 
@@ -136,7 +143,7 @@ class FeedParser:
         item = {}
         for element_name in ['title', 'url', 'description', 'content']:
             element = item_element.find(self._item_paths[self.feed_type][element_name])
-            if element is not None:
+            if element is not None and element.text is not None:
                 item[element_name] = plaintext(element.text)
             else:
                 item[element_name] = None
@@ -172,3 +179,43 @@ def get_or_create_feed(feed_url):
         db.session.add(feed)
         db.session.commit()
         return feed
+
+def get_or_create_feed_item(feed, item_data):
+    try:
+        feed_item = (
+            FeedItem
+            .query
+            .filter_by(feed_id=feed.id, url=item_data['url'])
+            .one()
+        )
+        return feed_item, False
+    except NoResultFound:
+        feed_item = FeedItem(feed_id=feed.id, **item_data)
+        return feed_item, True
+
+
+async def get_feed_content(semaphore, session, feed):
+    async with semaphore:
+        async with session.get(feed.feed_url) as response:
+            return feed, await response.read()
+
+
+async def process_feeds():
+    semaphore = asyncio.Semaphore(constants.MAX_ASYNC_REQUESTS)
+    async with aiohttp.ClientSession() as session:
+        tasks = [
+            asyncio.ensure_future(get_feed_content(semaphore, session, feed))
+            for feed in Feed.query.all()
+        ]
+
+        results = await asyncio.gather(*tasks)
+        now = datetime.datetime.utcnow()
+        for feed, result in results:
+            feed.last_processed = now
+            db.session.add(feed)
+            for item_data in FeedParser(feed.feed_url, result).items:
+                feed_item, created = get_or_create_feed_item(feed, item_data)
+                if created:
+                    db.session.add(feed_item)
+
+        db.session.commit()
