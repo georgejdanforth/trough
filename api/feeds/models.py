@@ -11,3 +11,16 @@ class Feed(BaseModel):
     title = db.Column(TEXT, nullable=False)
     feed_type = db.Column(db.Integer, nullable=False)
     last_processed = db.Column(db.DateTime)
+
+
+class FeedItem(BaseModel):
+
+    title = db.Column(TEXT, nullable=False)
+    url = db.Column(TEXT, nullable=False)
+    pubdate = db.Column(db.DateTime)
+    description = db.Column(TEXT)
+    content = db.Column(TEXT)
+
+    saved = db.Column(db.Boolean, default=False)
+
+    feed_id = db.Column(db.Integer, db.ForeignKey('feed.id'), nullable=False)
