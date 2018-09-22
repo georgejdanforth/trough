@@ -1,4 +1,7 @@
-from sqlalchemy.dialects.postgresql import TEXT
+from sqlalchemy.dialects.postgresql import (
+    JSON,
+    TEXT
+)
 
 from api.extensions import db
 from api.models import BaseModel
@@ -20,6 +23,7 @@ class FeedItem(BaseModel):
     pubdate = db.Column(db.DateTime)
     description = db.Column(TEXT)
     content = db.Column(TEXT)
+    enclosure = db.Column(JSON)
 
     saved = db.Column(db.Boolean, default=False)
 
