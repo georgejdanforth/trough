@@ -1,7 +1,9 @@
+import dateparser
 import re
 import requests
 
 from io import StringIO
+from pattern.web import plaintext
 from sqlalchemy.orm.exc import NoResultFound
 from xml.etree import ElementTree
 
@@ -23,15 +25,37 @@ class FeedParser:
         }
     }
 
-    def __init__(self, feed_url, parse_metadata=False, parse_items=False):
-        feed_response = requests.get(feed_url)
-        if not feed_response.ok:
-            raise ValueError(
-                f'Bad response {feed_response.status_code} for URL: {feed_url}'
-            )
+    _item_paths = {
+        FeedType.rss.value: {
+            'item': './channel/item',
+            'url': './link',
+            'title': './title',
+            'pubdate': './pubDate',
+            'description': './description',
+            'content': '',
+            'enclosure': './enclosure'
+        },
+        FeedType.atom.value: {
+            'item': './entry',
+            'title': './title',
+            'url': './id',
+            'pubdate': './updated',
+            'description': './summary',
+            'content': './content',
+            'enclosure': ''
+        }
+    }
+
+    def __init__(
+        self,
+        feed_url,
+        response_content,
+        parse_metadata=False,
+        parse_items=False
+    ):
 
         self.feed_url = self._clean_url(feed_url)
-        self.feed_element = self._clean_namespaces(feed_response.content.decode('utf-8'))
+        self.feed_element = self._clean_namespaces(response_content.decode('utf-8'))
         self.feed_type = self._classify_feed_type()
 
         self._metadata = self._parse_metadata() if parse_metadata else None
@@ -58,6 +82,13 @@ class FeedParser:
             **self._metadata,
             **{'feed_url': self.feed_url, 'feed_type': self.feed_type}
         }
+
+    @property
+    def items(self):
+        if not self._items:
+            self._items = self._parse_items()
+
+        return self._items
 
 
     def _classify_feed_type(self):
@@ -93,9 +124,47 @@ class FeedParser:
 
         return {'title': title, 'site_url': site_url}
 
+    def _parse_items(self):
+        return [
+            self._parse_item(item_element)
+            for item_element in self.feed_element.findall(
+                self._item_paths[self.feed_type]['item']
+            )
+        ]
 
-def get_or_create_feed(url):
-    feed_parser = FeedParser(url)
+    def _parse_item(self, item_element):
+        item = {}
+        for element_name in ['title', 'url', 'description', 'content']:
+            element = item_element.find(self._item_paths[self.feed_type][element_name])
+            if element is not None:
+                item[element_name] = plaintext(element.text)
+            else:
+                item[element_name] = None
+
+        pubdate_element = item_element.find(self._item_paths[self.feed_type]['pubdate'])
+        if pubdate_element is not None:
+            item['pubdate'] = dateparser.parse(pubdate_element.text)
+        else:
+            item['pubdate'] = None
+
+        enclosure_element = item_element.find(self._item_paths[self.feed_type]['enclosure'])
+        if enclosure_element is not None:
+            item['enclosure'] = enclosure_element.attrib
+        else:
+            item['enclosure'] = None
+
+        return item
+
+
+def get_or_create_feed(feed_url):
+    feed_response = requests.get(feed_url)
+    if not feed_response.ok:
+        raise ValueError(
+            f'Bad response {feed_response.status_code} for URL: {feed_url}'
+        )
+
+    feed_parser = FeedParser(feed_url, feed_response.content)
+
     try:
         return Feed.query.filter_by(feed_url=feed_parser.feed_url).one()
     except NoResultFound:
