@@ -12,5 +12,5 @@ const getConfig = () => {
 };
 
 export function login(creds) {
-    return axios.post(`${BASE_URL}/users/login`, creds, getConfig());
+    return axios.post(`${BASE_URL}/userdata/login`, creds, getConfig());
 }

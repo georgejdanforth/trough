@@ -22,10 +22,7 @@ def set_token_identity(user):
 
 @jwt.user_claims_loader
 def set_token_claims(user):
-    return {
-        'email': user.email,
-        'username': user.username
-    }
+    return {'email': user.email}
 
 
 @jwt.token_in_blacklist_loader

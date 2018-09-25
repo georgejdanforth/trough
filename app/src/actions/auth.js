@@ -33,14 +33,11 @@ export function loginUser (creds) {
         dispatch(requestLogin(creds));
         return login(creds)
             .then((response) => {
-                const accessToken = response.data.access_token;
+                const { accessToken, refreshToken } = response.data;
                 const { identity, user_claims } = jwtDecode(accessToken);
                 localStorage.setItem('access_token', accessToken);
-                dispatch(receiveLogin({
-                    id: identity,
-                    username: user_claims.username,
-                    email: user_claims.email
-                }));
+                localStorage.setItem('refresh_token', refreshToken);
+                dispatch(receiveLogin({ id: identity, email: user_claims.email }));
             })
             .catch((error) =>{
                 const { status, data } = error.response;
@@ -49,7 +46,7 @@ export function loginUser (creds) {
                 if (status === 400) {
                     errorType = errors.incorrectPassword;
                 } else if (status === 404) {
-                    errorType = errors.usernameNotFound;
+                    errorType = errors.userNotFound;
                 } else {
                     errorType = errors.unknown;
                 }
