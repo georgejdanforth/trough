@@ -5,6 +5,13 @@ from api.extensions import (
 from api.models import BaseModel
 
 
+user_feed = db.Table(
+    'user_feed',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('feed_id', db.Integer, db.ForeignKey('feed.id'), primary_key=True)
+)
+
+
 class User(BaseModel):
 
     email = db.Column(db.String(255), unique=True, nullable=False)
@@ -16,6 +23,13 @@ class User(BaseModel):
     last_login_ip = db.Column(db.String(45))
     current_login_ip = db.Column(db.String(45))
     login_count = db.Column(db.Integer(), nullable=False, default=0)
+
+    feeds = db.relationship(
+        'Feed',
+        secondary=user_feed,
+        lazy='dynamic',
+        backref=db.backref('users', lazy='dynamic')
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
