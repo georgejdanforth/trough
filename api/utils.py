@@ -1,5 +1,6 @@
-import re
 import functools
+import re
+import types
 
 from flask import (
     json,
@@ -31,7 +32,33 @@ class StringConverters:
         words = [word for word in re.split(r'_+', string) if word]
         return words[0] + ''.join(word.title() for word in words[1:])
 
+
 class Responses:
+
+    @staticmethod
+    def _is_iterable(data):
+        return any([
+            isinstance(data, list),
+            isinstance(data, map),
+            isinstance(data, set),
+            isinstance(data, types.GeneratorType)
+        ])
+
+    @staticmethod
+    def _preprocess_data(data):
+        if isinstance(data, dict):
+            return {
+                StringConverters.snake_to_camel(key)
+                if isinstance(key, str)
+                else key: Responses._preprocess_data(value)
+                for key, value in data.items()
+            }
+
+        elif Responses._is_iterable(data):
+            return [Responses._preprocess_data(datum) for datum in data]
+
+        else:
+            return data
 
     @staticmethod
     def ok():
@@ -39,13 +66,7 @@ class Responses:
 
     @staticmethod
     def json_response(data, status_code=HTTPStatus.OK.value):
-        response_json = json.dumps({
-            StringConverters.snake_to_camel(key)
-            if isinstance(key, str)
-            else key: value
-            for key, value in data.items()
-        })
-
+        response_json = json.dumps(Responses._preprocess_data(data), default=str)
         return Response(
             response_json,
             status=status_code,
