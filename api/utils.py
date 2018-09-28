@@ -38,7 +38,7 @@ class Responses:
         return Response(status=HTTPStatus.OK.value)
 
     @staticmethod
-    def json_response(data, status_code):
+    def json_response(data, status_code=HTTPStatus.OK.value):
         response_json = json.dumps({
             StringConverters.snake_to_camel(key)
             if isinstance(key, str)

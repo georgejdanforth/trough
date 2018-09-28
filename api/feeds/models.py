@@ -4,10 +4,15 @@ from sqlalchemy.dialects.postgresql import (
 )
 
 from api.extensions import db
-from api.models import BaseModel
+from api.models import (
+    BaseModel,
+    Serializable
+)
 
 
-class Feed(BaseModel):
+class Feed(BaseModel, Serializable):
+
+    __public__ = ['feed_url', 'site_url', 'title', 'feed_type']
 
     feed_url = db.Column(TEXT, nullable=False)
     site_url = db.Column(TEXT)

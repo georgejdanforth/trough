@@ -9,6 +9,7 @@ import { loginUser } from '../actions/auth';
 import './App.css';
 
 import Login from './Login';
+import Main from './Main';
 
 
 class App extends React.Component {
@@ -20,7 +21,9 @@ class App extends React.Component {
                     <Route
                         exact
                         path="/"
-                        render={() => (<div><p>Logged out view</p></div>)}
+                        render={() => isAuthenticated
+                            ? (<Main/>)
+                            : (<div><p>Logged out view</p></div>)}
                     />
                     <Route
                         exact

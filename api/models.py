@@ -1,5 +1,6 @@
 import datetime
 
+from abc import abstractmethod
 from sqlalchemy.ext.declarative import declared_attr
 
 from api.extensions import db
@@ -24,3 +25,18 @@ class BaseModel(db.Model):
         default=datetime.datetime.utcnow,
         onupdate=datetime.datetime.utcnow
     )
+
+
+class Serializable:
+
+    @property
+    @abstractmethod
+    def __public__(self):
+        """
+        """
+
+    def to_dict(self):
+        return {
+            field_name: getattr(self, field_name)
+            for field_name in self.__public__
+        }
