@@ -14,6 +14,7 @@ from api.feeds.models import (
     Feed,
     FeedItem
 )
+from api.feeds import constants
 from api.userdata.models import user_feed
 from api.utils import Responses
 
@@ -33,5 +34,23 @@ def get_feeds():
             .join(user_feed, user_feed.c.feed_id == Feed.id)
             .filter(user_feed.c.user_id == get_jwt_identity())
             .all()
+        )
+    )
+
+
+@feeds.route('/feeditems/<int:page>', methods=['GET'])
+@cross_origin()
+@jwt_required
+def get_feed_items(page):
+    return Responses.json_response(
+        map(
+            methodcaller('to_dict'),
+            FeedItem
+            .query
+            .join(Feed, Feed.id == FeedItem.feed_id)
+            .join(user_feed, Feed.id == user_feed.c.feed_id)
+            .filter(user_feed.c.feed_id == get_jwt_identity())
+            .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
+            .items
         )
     )

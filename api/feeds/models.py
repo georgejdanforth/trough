@@ -12,7 +12,7 @@ from api.models import (
 
 class Feed(BaseModel, Serializable):
 
-    __public__ = ['feed_url', 'site_url', 'title', 'feed_type']
+    __public__ = ['id', 'feed_url', 'site_url', 'title', 'feed_type']
 
     feed_url = db.Column(TEXT, nullable=False)
     site_url = db.Column(TEXT)
@@ -21,7 +21,18 @@ class Feed(BaseModel, Serializable):
     last_processed = db.Column(db.DateTime)
 
 
-class FeedItem(BaseModel):
+class FeedItem(BaseModel, Serializable):
+
+    __public__ = [
+        'id',
+        'title',
+        'url',
+        'pubdate',
+        'description',
+        'content',
+        'enclosure',
+        'feed_dict'
+    ]
 
     title = db.Column(TEXT, nullable=False)
     url = db.Column(TEXT, nullable=False)
@@ -33,3 +44,8 @@ class FeedItem(BaseModel):
     saved = db.Column(db.Boolean, default=False)
 
     feed_id = db.Column(db.Integer, db.ForeignKey('feed.id'), nullable=False)
+    feed = db.relationship('Feed', backref='feed_items', lazy='subquery')
+
+    @property
+    def feed_dict(self):
+        return self.feed.to_dict()
