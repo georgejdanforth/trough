@@ -1,0 +1,8 @@
+.is-fullheight {
+    min-height: 100vh;
+    max-height: 100vh;
+    height: 100vh;
+    flex-direction: row;
+    justify-content: stretch;
+    overflow-y: auto;
+}
