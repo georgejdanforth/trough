@@ -31,7 +31,7 @@ class FeedItem(BaseModel, Serializable):
         'description',
         'content',
         'enclosure',
-        'feed_dict'
+        'feed_info'
     ]
 
     title = db.Column(TEXT, nullable=False)
@@ -47,5 +47,5 @@ class FeedItem(BaseModel, Serializable):
     feed = db.relationship('Feed', backref='feed_items', lazy='subquery')
 
     @property
-    def feed_dict(self):
+    def feed_info(self):
         return self.feed.to_dict()

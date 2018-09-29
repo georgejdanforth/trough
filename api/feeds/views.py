@@ -49,7 +49,8 @@ def get_feed_items(page):
             .query
             .join(Feed, Feed.id == FeedItem.feed_id)
             .join(user_feed, Feed.id == user_feed.c.feed_id)
-            .filter(user_feed.c.feed_id == get_jwt_identity())
+            .filter(user_feed.c.user_id == get_jwt_identity())
+            .order_by(FeedItem.pubdate.desc())
             .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
             .items
         )
