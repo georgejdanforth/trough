@@ -82,8 +82,8 @@ class Responses:
         )
 
 
-def receives_json(func):
-    @functools.wraps(func)
+def receives_json(endpoint):
+    @functools.wraps(endpoint)
     def wrapper(*args, **kwargs):
         request.json_data = {
             StringConverters.camel_to_snake(key)
@@ -92,7 +92,19 @@ def receives_json(func):
             for key, value in request.get_json().items()
         }
 
-        return func(*args, **kwargs)
+        return endpoint(*args, **kwargs)
 
     return wrapper
 
+
+def receives_query_params(endpoint):
+    @functools.wraps(endpoint)
+    def wrapper(*args, **kwargs):
+        request.query_params = {
+            StringConverters.camel_to_snake(key): value
+            for key, value in request.args.items()
+        }
+
+        return endpoint(*args, **kwargs)
+
+    return wrapper
