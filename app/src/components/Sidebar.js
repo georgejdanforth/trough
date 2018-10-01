@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import {
     Menu,
     MenuLabel,
@@ -7,9 +8,10 @@ import {
 } from 'bloomer';
 
 import { getFeeds } from '../utils/http';
+import { setFeedFilter } from '../actions/filters';
 
 
-export default class Sidebar extends React.Component {
+class Sidebar extends React.Component {
     constructor(props) {
         super(props);
         this.state = { feeds: [] };
@@ -20,7 +22,16 @@ export default class Sidebar extends React.Component {
 
     renderFeeds = () =>
         this.state.feeds.map(
-            feed => <li key={feed.id}><MenuLink>{ feed.title }</MenuLink></li>
+            feed => (
+                <li key={feed.id}>
+                    <MenuLink
+                        className={this.props.activeFeedId === feed.id ? 'is-active': ''}
+                        onClick={() => this.props.setFeedFilter(feed.id)}
+                    >
+                        { feed.title }
+                    </MenuLink>
+                </li>
+            )
         );
 
     render() {
@@ -34,3 +45,9 @@ export default class Sidebar extends React.Component {
         );
     }
 }
+
+
+const mapStateToProps = state => ({ activeFeedId: state.filters.feedId });
+
+
+export default connect(mapStateToProps, { setFeedFilter })(Sidebar);
