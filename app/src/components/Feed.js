@@ -5,6 +5,8 @@ import {
     Content,
 } from 'bloomer';
 
+import './Feed.css';
+
 import { getFeedItems } from '../utils/http';
 
 
@@ -64,7 +66,7 @@ class Feed extends React.Component {
 
     render() {
         return (
-            <Container>
+            <Container className='feed-container'>
                 { this.state.feedItems === null ? 'Loading...' : this.renderFeedItems() }
             </Container>
         );

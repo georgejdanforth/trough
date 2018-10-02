@@ -7,8 +7,13 @@ import {
     MenuList
 } from 'bloomer';
 
+import './Sidebar.css';
+
 import { getFeeds } from '../utils/http';
-import { setFeedFilter } from '../actions/filters';
+import {
+    clearFilters,
+    setFeedFilter
+} from '../actions/filters';
 
 
 class Sidebar extends React.Component {
@@ -38,6 +43,14 @@ class Sidebar extends React.Component {
         return (
             <Menu>
                 <MenuList>
+                    <li>
+                        <MenuLink
+                            className={!this.props.activeFeedId ? 'is-active': ''}
+                            onClick={this.props.clearFilters}
+                        >
+                            All
+                        </MenuLink>
+                    </li>
                     <MenuLabel>Feeds</MenuLabel>
                     { this.renderFeeds() }
                 </MenuList>
@@ -50,4 +63,7 @@ class Sidebar extends React.Component {
 const mapStateToProps = state => ({ activeFeedId: state.filters.feedId });
 
 
-export default connect(mapStateToProps, { setFeedFilter })(Sidebar);
+export default connect(
+    mapStateToProps,
+    { setFeedFilter, clearFilters }
+)(Sidebar);

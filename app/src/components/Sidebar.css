@@ -1,0 +1,13 @@
+.menu-label {
+    color: lightgray;
+}
+
+.menu-list a {
+    color: lightgray;
+    background-color: transparent;
+}
+
+.menu-list a.is-active {
+    color: white;
+    background-color: transparent;
+}
