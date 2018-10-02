@@ -33,11 +33,17 @@ const refresh = wrapped => (...args) =>  {
     return wrapped(...args);
 };
 
+const filtersToQueryParams = filters =>
+    Object
+        .entries(filters)
+        .map(([key, value]) => `${key}=${value}`)
+        .join('&');
+
 export const login = creds =>
     axios.post(`${BASE_URL}/userdata/login`, creds, getAccessConfig());
 
 export const getFeeds = refresh(() =>
     axios.get(`${BASE_URL}/feeds/feeds`, getAccessConfig()));
 
-export const getFeedItems = refresh(() =>
-    axios.get(`${BASE_URL}/feeds/feeditems/1`, getAccessConfig()));
+export const getFeedItems = refresh(filters =>
+    axios.get(`${BASE_URL}/feeds/feeditems/1?${filtersToQueryParams(filters)}`, getAccessConfig()));
