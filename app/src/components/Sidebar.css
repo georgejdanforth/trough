@@ -7,7 +7,36 @@
     background-color: transparent;
 }
 
-.menu-list a.is-active {
+.menu-list a:hover {
     color: white;
     background-color: transparent;
+}
+
+.menu-list a.is-active {
+    background-color: transparent;
+    color: white;
+    font-weight: bold;
+}
+
+.menu-list-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.menu-list-header button {
+    padding-top: 2px;
+    border: none;
+    outline: none;
+    background: none;
+    cursor: pointer;
+}
+
+button.add-button svg {
+    fill: lightgray;
+}
+
+button.add-button:hover svg {
+    fill: white;
 }

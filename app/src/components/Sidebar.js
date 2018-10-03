@@ -6,6 +6,8 @@ import {
     MenuLink,
     MenuList
 } from 'bloomer';
+import Icon from '@mdi/react';
+import { mdiPlusCircleOutline } from '@mdi/js';
 
 import './Sidebar.css';
 
@@ -51,7 +53,12 @@ class Sidebar extends React.Component {
                             All
                         </MenuLink>
                     </li>
-                    <MenuLabel>Feeds</MenuLabel>
+                    <div className={'menu-list-header'}>
+                        <span className={'menu-label'}>Feeds</span>
+                        <button className={'add-button'} onClick={this.props.openModal}>
+                            <Icon path={mdiPlusCircleOutline} size={0.65}/>
+                        </button>
+                    </div>
                     { this.renderFeeds() }
                 </MenuList>
             </Menu>
