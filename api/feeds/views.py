@@ -1,3 +1,5 @@
+import requests
+
 from flask import (
     Blueprint,
     request
@@ -8,13 +10,14 @@ from flask_jwt_extended import (
     jwt_required
 )
 from operator import methodcaller
+from sqlalchemy.orm.exc import NoResultFound
 
-from api.extensions import db
+from api.feeds import constants
 from api.feeds.models import (
     Feed,
     FeedItem
 )
-from api.feeds import constants
+from api.feeds.utils import FeedParser
 from api.userdata.models import user_feed
 from api.utils import (
     Responses,
@@ -60,3 +63,27 @@ def get_feed_items(page):
             .items
         )
     )
+
+
+@feeds.route('/isvalid', methods=['GET'])
+@cross_origin()
+@jwt_required
+@receives_query_params
+def is_valid_feed():
+    is_valid = False
+    feed_url = request.query_params.get('url')
+
+    if feed_url:
+        try:
+            Feed.query.filter_by(feed_url=FeedParser.clean_url(feed_url)).one()
+            is_valid = True
+        except NoResultFound:
+            feed_response = requests.get(feed_url)
+            if feed_response.ok:
+                try:
+                    FeedParser(feed_url, feed_response.content, parse_metadata=True)
+                    is_valid = True
+                except ValueError:
+                    pass
+
+    return Responses.json_response({'is_valid', is_valid})

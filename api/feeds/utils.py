@@ -61,7 +61,7 @@ class FeedParser:
         parse_items=False
     ):
 
-        self.feed_url = self._clean_url(feed_url)
+        self.feed_url = self.clean_url(feed_url)
         self.feed_element = self._clean_namespaces(response_content.decode('utf-8'))
         self.feed_type = self._classify_feed_type()
 
@@ -69,7 +69,7 @@ class FeedParser:
         self._items = self._parse_items() if parse_items else None
 
     @staticmethod
-    def _clean_url(url):
+    def clean_url(url):
         return url.split('?', maxsplit=1)[0]
 
     @staticmethod
@@ -96,7 +96,6 @@ class FeedParser:
             self._items = self._parse_items()
 
         return self._items
-
 
     def _classify_feed_type(self):
         if self.feed_element.tag == 'rss':
