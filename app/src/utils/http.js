@@ -50,3 +50,6 @@ export const getFeedItems = refresh(filters =>
 
 export const validateFeed = refresh(feedUrl =>
     axios.get(`${BASE_URL}/feeds/isvalid?url=${feedUrl}`, getAccessConfig()));
+
+export const addFeed = refresh(feedUrl =>
+    axios.post(`${BASE_URL}/feeds/add`, { feedUrl }, getAccessConfig()));

@@ -12,15 +12,23 @@ from flask_jwt_extended import (
 from operator import methodcaller
 from sqlalchemy.orm.exc import NoResultFound
 
+from api.extensions import db
 from api.feeds import constants
 from api.feeds.models import (
     Feed,
     FeedItem
 )
-from api.feeds.utils import FeedParser
-from api.userdata.models import user_feed
+from api.feeds.utils import (
+    FeedParser,
+    get_or_create_feed
+)
+from api.userdata.models import (
+    User,
+    user_feed
+)
 from api.utils import (
     Responses,
+    receives_json,
     receives_query_params
 )
 
@@ -87,3 +95,17 @@ def is_valid_feed():
                     pass
 
     return Responses.json_response({'is_valid': is_valid})
+
+
+@feeds.route('/add', methods=['POST'])
+@cross_origin()
+@jwt_required
+@receives_json
+def add_feed():
+    feed_url = request.json_data.get('feed_url')
+    feed = get_or_create_feed(feed_url)
+    user = User.query.filter_by(id=get_jwt_identity()).one()
+    user.feeds.append(feed)
+    db.session.commit()
+
+    return Responses.ok()

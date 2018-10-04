@@ -16,7 +16,7 @@ import { mdiLoading } from '@mdi/js';
 import { Icon } from '@mdi/react';
 import { isWebUri } from 'valid-url';
 
-import { validateFeed } from '../utils/http';
+import { addFeed, validateFeed } from '../utils/http';
 
 
 const getInitialState = () => ({
@@ -50,6 +50,11 @@ export default class AddFeedModal extends React.Component {
         });
     };
 
+    submit = () => addFeed(this.state.feedUrl).then(() => {
+        this.close();
+        this.props.refresh();
+    });
+
     render() {
         return (
             <Modal isActive={this.props.isActive}>
@@ -81,7 +86,10 @@ export default class AddFeedModal extends React.Component {
                                 </FormIcon>
                             </Control>
                             <Control>
-                                <Button disabled={!this.state.isValidFeedUrl}>
+                                <Button
+                                    disabled={!this.state.isValidFeedUrl}
+                                    onClick={this.submit}
+                                >
                                     Add
                                 </Button>
                             </Control>
