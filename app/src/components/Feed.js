@@ -51,12 +51,11 @@ class Feed extends React.Component {
     }
 
     _updateFeedItems(filters) {
-        this._asyncRequest = getFeedItems(filters).then(
-            ({ data }) => {
+        this._asyncRequest = getFeedItems(filters)
+            .then(({ data }) => {
                 this._asyncRequest = null;
                 this.setState({ feedItems: data });
-            }
-        );
+            });
     }
 
     renderFeedItems = () =>

@@ -179,6 +179,7 @@ def get_or_create_feed(feed_url):
         db.session.commit()
         return feed
 
+
 def get_or_create_feed_item(feed, item_data):
     try:
         feed_item = (

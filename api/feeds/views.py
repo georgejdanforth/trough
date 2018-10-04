@@ -86,4 +86,4 @@ def is_valid_feed():
                 except ValueError:
                     pass
 
-    return Responses.json_response({'is_valid', is_valid})
+    return Responses.json_response({'is_valid': is_valid})
