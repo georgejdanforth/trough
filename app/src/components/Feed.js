@@ -7,16 +7,8 @@ import {
 
 import './Feed.css';
 
+import FeedItem from './FeedItem';
 import { getFeedItems } from '../utils/http';
-
-
-const FeedItem = props => (
-    <Content>
-        <span>{ props.feedInfo.title } | { props.pubdate }</span>
-        <h4><a href={props.url} target='_blank'>{ props.title }</a></h4>
-        <p>{ props.description }</p>
-    </Content>
-);
 
 
 class Feed extends React.Component {
