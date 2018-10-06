@@ -10,6 +10,7 @@ from flask_jwt_extended import (
     jwt_required
 )
 from operator import methodcaller
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 from api.extensions import db
@@ -24,7 +25,8 @@ from api.feeds.utils import (
 )
 from api.userdata.models import (
     User,
-    user_feed
+    user_feed,
+    user_saved_feed_item
 )
 from api.utils import (
     Responses,
@@ -107,6 +109,41 @@ def add_feed():
     feed = get_or_create_feed(feed_url)
     user = User.query.filter_by(id=get_jwt_identity()).one()
     user.feeds.append(feed)
+    db.session.commit()
+
+    return Responses.ok()
+
+
+@feeds.route('/save/<int:feed_item_id>', methods=['POST'])
+@cross_origin()
+@jwt_required
+def save_feed_item(feed_item_id):
+    try:
+        db.session.execute(
+            user_saved_feed_item.insert().values(
+                user_id=get_jwt_identity(),
+                feed_item_id=feed_item_id
+            )
+        )
+
+        db.session.commit()
+    except IntegrityError:
+        pass
+
+    return Responses.ok()
+
+
+@feeds.route('/unsave/<int:feed_item_id>', methods=['DELETE'])
+@cross_origin()
+@jwt_required
+def remove_saved_feed_item(feed_item_id):
+    db.session.execute(
+        user_saved_feed_item
+        .delete()
+        .where(user_saved_feed_item.c.user_id == get_jwt_identity())
+        .where(user_saved_feed_item.c.feed_item_id == feed_item_id)
+    )
+
     db.session.commit()
 
     return Responses.ok()

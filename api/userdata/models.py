@@ -15,7 +15,8 @@ user_feed = db.Table(
 user_saved_feed_item = db.Table(
     'user_saved_feed_item',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('feeditem_id', db.Integer, db.ForeignKey('feeditem.id'), primary_key=True)
+    db.Column('feed_item_id', db.Integer, db.ForeignKey('feeditem.id'), primary_key=True),
+    db.UniqueConstraint('user_id', 'feed_item_id')
 )
 
 
