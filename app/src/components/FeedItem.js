@@ -1,12 +1,20 @@
 import React from 'react';
 import { Content } from 'bloomer';
+import { mdiBookmark, mdiBookmarkOutline } from '@mdi/js';
+import { Icon } from '@mdi/react';
 import moment from 'moment';
 
 import './FeedItem.css';
+import { saveFeedItem, unsaveFeedItem } from '../utils/http';
 
 const MAX_WORDS = 100;
 
 export default class FeedItem extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { isSaved: this.props.isSaved };
+    }
 
     trimWords = text => {
         if (!text) return text;
@@ -16,6 +24,10 @@ export default class FeedItem extends React.Component {
             ? words.slice(0, MAX_WORDS).join(' ') + ' […]'
             : words.join(' ');
     };
+
+    save = () => saveFeedItem(this.props.id).then(() => this.setState({ isSaved: true }));
+
+    unsave = () => unsaveFeedItem(this.props.id).then(() => this.setState({ isSaved: false }));
 
     render() {
         return (
@@ -31,6 +43,14 @@ export default class FeedItem extends React.Component {
                         >
                             { this.props.title }
                         </a>
+                    </span>
+                    <span className={'save'}>
+                        <Icon
+                            onClick={this.state.isSaved ? this.unsave : this.save}
+                            path={this.state.isSaved ? mdiBookmark : mdiBookmarkOutline}
+                            size={0.8}
+                            color={'gray'}
+                        />
                     </span>
                 </div>
                 <p>{ this.trimWords(this.props.description) }</p>

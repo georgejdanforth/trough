@@ -22,3 +22,16 @@
 .item-title:hover {
     text-decoration: underline;
 }
+
+.save {
+    padding-left: 0.4rem;
+}
+
+.save:hover {
+    cursor: pointer;
+}
+
+.save svg {
+    position: relative;
+    top: 0.2rem;
+}

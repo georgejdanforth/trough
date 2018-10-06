@@ -53,3 +53,9 @@ export const validateFeed = refresh(feedUrl =>
 
 export const addFeed = refresh(feedUrl =>
     axios.post(`${BASE_URL}/feeds/add`, { feedUrl }, getAccessConfig()));
+
+export const saveFeedItem = refresh(feedItemId =>
+    axios.post(`${BASE_URL}/feeds/save/${feedItemId}`, null, getAccessConfig()));
+
+export const unsaveFeedItem = refresh(feedItemId =>
+    axios.delete(`${BASE_URL}/feeds/unsave/${feedItemId}`, getAccessConfig()));
