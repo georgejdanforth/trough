@@ -60,6 +60,16 @@ def get_feeds():
 @receives_query_params
 def get_feed_items(page):
     user = User.query.filter_by(id=get_jwt_identity()).one()
+    if request.query_params.get('saved'):
+        return Responses.json_response((
+            feed_item.to_dict(user=user)
+            for feed_item in sorted(
+                user.saved_feed_items,
+                key=lambda fi: fi.pubdate,
+                reverse=True
+            )
+        ))
+
     return Responses.json_response((
         feed_item.to_dict(user=user)
         for feed_item in (

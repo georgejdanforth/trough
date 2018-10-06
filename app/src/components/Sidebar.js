@@ -14,7 +14,8 @@ import './Sidebar.css';
 import { getFeeds } from '../utils/http';
 import {
     clearFilters,
-    setFeedFilter
+    setFeedFilter,
+    setSavedFilter
 } from '../actions/filters';
 
 
@@ -32,7 +33,7 @@ class Sidebar extends React.Component {
             feed => (
                 <li key={feed.id}>
                     <MenuLink
-                        className={this.props.activeFeedId === feed.id ? 'is-active': ''}
+                        className={this.props.filters.feedId === feed.id ? 'is-active': ''}
                         onClick={() => this.props.setFeedFilter(feed.id)}
                     >
                         { feed.title }
@@ -47,10 +48,18 @@ class Sidebar extends React.Component {
                 <MenuList>
                     <li>
                         <MenuLink
-                            className={!this.props.activeFeedId ? 'is-active': ''}
+                            className={!Object.keys(this.props.filters).length ? 'is-active': ''}
                             onClick={this.props.clearFilters}
                         >
                             All
+                        </MenuLink>
+                    </li>
+                    <li>
+                        <MenuLink
+                            className={this.props.filters.saved ? 'is-active': ''}
+                            onClick={this.props.setSavedFilter}
+                        >
+                            Saved
                         </MenuLink>
                     </li>
                     <div className={'menu-list-header'}>
@@ -67,10 +76,10 @@ class Sidebar extends React.Component {
 }
 
 
-const mapStateToProps = state => ({ activeFeedId: state.filters.feedId });
+const mapStateToProps = state => ({ filters: state.filters });
 
 
 export default connect(
     mapStateToProps,
-    { setFeedFilter, clearFilters }
+    { setFeedFilter, setSavedFilter, clearFilters }
 )(Sidebar);

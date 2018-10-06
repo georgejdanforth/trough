@@ -23,12 +23,12 @@ const refreshToken = () =>
     axios.post(`${BASE_URL}/userdata/refresh_access_token`, null, getRefreshConfig())
         .then(({ data }) => localStorage.setItem('access_token', data.accessToken));
 
-const refresh = wrapped => (...args) =>  {
+const refresh = wrapped => async (...args) =>  {
     const { exp } = jwtDecode(localStorage.getItem('access_token'));
     const expirationDateTime = new Date(exp * 1000);
     const now = new Date();
 
-    if (expirationDateTime < now) refreshToken();
+    if (expirationDateTime < now) await refreshToken();
 
     return wrapped(...args);
 };
