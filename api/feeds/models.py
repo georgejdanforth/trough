@@ -31,7 +31,8 @@ class FeedItem(BaseModel, Serializable):
         'description',
         'content',
         'enclosure',
-        'feed_info'
+        'feed_info',
+        'is_saved'
     ]
 
     title = db.Column(TEXT, nullable=False)

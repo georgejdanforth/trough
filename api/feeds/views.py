@@ -57,20 +57,21 @@ def get_feeds():
 @jwt_required
 @receives_query_params
 def get_feed_items(page):
-    return Responses.json_response(
-        map(
-            methodcaller('to_dict'),
+    user = User.query.filter_by(id=get_jwt_identity()).one()
+    return Responses.json_response((
+        feed_item.to_dict(user=user)
+        for feed_item in (
             FeedItem
             .query
             .join(Feed, Feed.id == FeedItem.feed_id)
             .join(user_feed, Feed.id == user_feed.c.feed_id)
-            .filter(user_feed.c.user_id == get_jwt_identity())
+            .filter(user_feed.c.user_id == user.id)
             .filter_by(**request.query_params)
             .order_by(FeedItem.pubdate.desc())
             .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
             .items
         )
-    )
+    ))
 
 
 @feeds.route('/isvalid', methods=['GET'])
