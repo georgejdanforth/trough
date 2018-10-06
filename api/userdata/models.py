@@ -12,6 +12,13 @@ user_feed = db.Table(
 )
 
 
+user_saved_feed_item = db.Table(
+    'user_saved_feed_item',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('feeditem_id', db.Integer, db.ForeignKey('feeditem.id'), primary_key=True)
+)
+
+
 class User(BaseModel):
 
     email = db.Column(db.String(255), unique=True, nullable=False)
@@ -30,6 +37,8 @@ class User(BaseModel):
         lazy='dynamic',
         backref=db.backref('users', lazy='dynamic')
     )
+
+    saved_feed_items = db.relationship('FeedItem', secondary=user_saved_feed_item)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -49,3 +49,6 @@ class FeedItem(BaseModel, Serializable):
     @property
     def feed_info(self):
         return self.feed.to_dict()
+
+    def is_saved(self, user):
+        return self in user.saved_feed_items

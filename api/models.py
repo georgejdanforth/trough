@@ -35,12 +35,17 @@ class Serializable:
         """
         """
 
-    def to_dict(self, ignore=None):
-        if ignore is None:
-            ignore = []
+    def _get_field(self, field_name, **kwargs):
+        field = getattr(self, field_name)
+        if callable(field):
+            return field(**kwargs)
 
+        return field
+
+    def to_dict(self, **kwargs):
+        ignore = kwargs.get('ignore', [])
         return {
-            field_name: getattr(self, field_name)
+            field_name: self._get_field(field_name, **kwargs)
             for field_name in self.__public__
             if field_name not in ignore
         }
