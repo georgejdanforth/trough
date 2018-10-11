@@ -59,3 +59,6 @@ export const saveFeedItem = refresh(feedItemId =>
 
 export const unsaveFeedItem = refresh(feedItemId =>
     axios.delete(`${BASE_URL}/feeds/unsave/${feedItemId}`, getAccessConfig()));
+
+export const getTopics = refresh(() =>
+    axios.get(`${BASE_URL}/feeds/topics`, getAccessConfig()));

@@ -41,6 +41,8 @@ class User(BaseModel):
 
     saved_feed_items = db.relationship('FeedItem', secondary=user_saved_feed_item)
 
+    custom_topics = db.relationship('CustomTopic', lazy=True)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.password = (

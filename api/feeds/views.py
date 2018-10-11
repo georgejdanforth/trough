@@ -160,6 +160,21 @@ def remove_saved_feed_item(feed_item_id):
     return Responses.ok()
 
 
+@feeds.route('/topics', methods=['GET'])
+@cross_origin()
+@jwt_required
+def get_custom_topics():
+    return Responses.json_response((
+        custom_topic.to_dict() for custom_topic in (
+            User
+            .query
+            .filter_by(id=get_jwt_identity())
+            .one()
+            .custom_topics
+        )
+    ))
+
+
 @feeds.route('/topics/add', methods=['POST'])
 @cross_origin()
 @jwt_required

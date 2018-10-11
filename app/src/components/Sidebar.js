@@ -11,7 +11,7 @@ import { mdiPlusCircleOutline } from '@mdi/js';
 
 import './Sidebar.css';
 
-import { getFeeds } from '../utils/http';
+import { getFeeds, getTopics } from '../utils/http';
 import {
     clearFilters,
     setFeedFilter,
@@ -20,27 +20,32 @@ import {
 
 
 class Sidebar extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { feeds: [] };
+    state = {
+        feeds: [],
+        topics: []
+    };
+
+    componentDidMount() {
+        getTopics().then(({data}) => this.setState({ topics: data }));
+        getFeeds().then(({data}) => this.setState({ feeds: data }));
     }
 
-    componentDidMount = () =>
-        getFeeds().then(({ data }) => this.setState({ feeds: data }));
-
     renderFeeds = () =>
-        this.state.feeds.map(
-            feed => (
-                <li key={feed.id}>
-                    <MenuLink
-                        className={this.props.filters.feedId === feed.id ? 'is-active': ''}
-                        onClick={() => this.props.setFeedFilter(feed.id)}
-                    >
-                        { feed.title }
-                    </MenuLink>
-                </li>
-            )
-        );
+        this.state.feeds.map(feed => (
+            <li key={feed.id}>
+                <MenuLink
+                    className={this.props.filters.feedId === feed.id ? 'is-active': ''}
+                    onClick={() => this.props.setFeedFilter(feed.id)}
+                >
+                    { feed.title }
+                </MenuLink>
+            </li>
+        ));
+
+    renderTopics = () =>
+        this.state.topics.map(topic => (
+            <li key={topic.id}><MenuLink>{topic.name}</MenuLink></li>
+        ));
 
     render() {
         return (
@@ -62,6 +67,13 @@ class Sidebar extends React.Component {
                             Saved
                         </MenuLink>
                     </li>
+                    <div className={'menu-list-header'}>
+                        <span className={'menu-label'}>Topics</span>
+                        <button className={'add-button'}>
+                            <Icon path={mdiPlusCircleOutline} size={0.65}/>
+                        </button>
+                    </div>
+                    { this.renderTopics() }
                     <div className={'menu-list-header'}>
                         <span className={'menu-label'}>Feeds</span>
                         <button className={'add-button'} onClick={this.props.openModal}>
