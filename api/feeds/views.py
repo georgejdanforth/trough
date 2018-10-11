@@ -16,6 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from api.extensions import db
 from api.feeds import constants
 from api.feeds.models import (
+    CustomTopic,
     Feed,
     FeedItem
 )
@@ -154,6 +155,22 @@ def remove_saved_feed_item(feed_item_id):
         .where(user_saved_feed_item.c.feed_item_id == feed_item_id)
     )
 
+    db.session.commit()
+
+    return Responses.ok()
+
+
+@feeds.route('/topics/add', methods=['POST'])
+@cross_origin()
+@jwt_required
+@receives_json
+def add_custom_topic():
+    topic = CustomTopic(
+        name=request.json_data.get('name'),
+        user_id=get_jwt_identity()
+    )
+
+    db.session.add(topic)
     db.session.commit()
 
     return Responses.ok()

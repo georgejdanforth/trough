@@ -10,6 +10,14 @@ from api.models import (
 )
 
 
+custom_topic_feed = db.Table(
+    'custom_topic_feed',
+    db.Column('custom_topic_id', db.Integer, db.ForeignKey('customtopic.id'), primary_key=True),
+    db.Column('feed_id', db.Integer, db.ForeignKey('feed.id'), primary_key=True),
+    db.UniqueConstraint('custom_topic_id', 'feed_id')
+)
+
+
 class Feed(BaseModel, Serializable):
 
     __public__ = ['id', 'feed_url', 'site_url', 'title', 'feed_type']
@@ -53,3 +61,14 @@ class FeedItem(BaseModel, Serializable):
 
     def is_saved(self, user):
         return self in user.saved_feed_items
+
+
+class CustomTopic(BaseModel, Serializable):
+
+    __public__ = [
+        'id',
+        'name'
+    ]
+
+    name = db.Column(TEXT, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
