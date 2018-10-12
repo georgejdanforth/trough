@@ -7,6 +7,7 @@ import { mdiPlusCircleOutline } from '@mdi/js';
 import './Sidebar.css';
 
 import AddFeedForm from './AddFeedForm';
+import AddTopicForm from './AddTopicForm';
 import { getFeeds, getTopics } from '../utils/http';
 import {
     clearFilters,
@@ -65,7 +66,17 @@ class Sidebar extends React.Component {
                     </li>
                     <div className={'menu-list-header'}>
                         <span className={'menu-label'}>Topics</span>
-                        <button className={'add-button'}>
+                        <button
+                            className={'add-button'}
+                            onClick={() =>
+                                this.props.openModal(
+                                    <AddTopicForm
+                                        close={this.props.closeModal}
+                                        topics={this.state.topics}
+                                    />
+                                )
+                            }
+                        >
                             <Icon path={mdiPlusCircleOutline} size={0.65}/>
                         </button>
                     </div>
@@ -74,7 +85,13 @@ class Sidebar extends React.Component {
                         <span className={'menu-label'}>Feeds</span>
                         <button
                             className={'add-button'}
-                            onClick={() => this.props.openModal(<AddFeedForm close={this.props.closeModal}/>)}
+                            onClick={() =>
+                                this.props.openModal(
+                                    <AddFeedForm
+                                        close={this.props.closeModal}
+                                    />
+                                )
+                            }
                         >
                             <Icon path={mdiPlusCircleOutline} size={0.65}/>
                         </button>

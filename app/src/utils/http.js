@@ -62,3 +62,6 @@ export const unsaveFeedItem = refresh(feedItemId =>
 
 export const getTopics = refresh(() =>
     axios.get(`${BASE_URL}/feeds/topics`, getAccessConfig()));
+
+export const addTopic = refresh(name =>
+    axios.post(`${BASE_URL}/feeds/topics/add`, { name }, getAccessConfig()));
