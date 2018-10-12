@@ -120,7 +120,7 @@ class FeedParser:
             self._metadata_paths[self.feed_type]['site_url']
         )
 
-        if site_url_element is not None:
+        if site_url_element is not None and site_url_element.text:
             if self.feed_type == FeedType.rss.value:
                 site_url = site_url_element.text.strip()
             else:

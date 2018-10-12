@@ -1,16 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-    Menu,
-    MenuLabel,
-    MenuLink,
-    MenuList
-} from 'bloomer';
+import { Menu, MenuLink, MenuList } from 'bloomer';
 import Icon from '@mdi/react';
 import { mdiPlusCircleOutline } from '@mdi/js';
 
 import './Sidebar.css';
 
+import AddFeedForm from './AddFeedForm';
 import { getFeeds, getTopics } from '../utils/http';
 import {
     clearFilters,
@@ -76,7 +72,10 @@ class Sidebar extends React.Component {
                     { this.renderTopics() }
                     <div className={'menu-list-header'}>
                         <span className={'menu-label'}>Feeds</span>
-                        <button className={'add-button'} onClick={this.props.openModal}>
+                        <button
+                            className={'add-button'}
+                            onClick={() => this.props.openModal(<AddFeedForm close={this.props.closeModal}/>)}
+                        >
                             <Icon path={mdiPlusCircleOutline} size={0.65}/>
                         </button>
                     </div>
