@@ -19,7 +19,7 @@ class MenuItem extends React.Component {
             <li key={this.props.id}>
                 <div className={'menu-item'}>
                     <MenuLink
-                        className={this.props.active ? 'is-active': ''}
+                        className={this.props.isActive ? 'is-active': ''}
                         onClick={() => this.props.filterFn(this.props.id)}
                     >
                         { this.props.title || this.props.name }

@@ -2,12 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Menu, MenuLink, MenuList } from 'bloomer';
 import Icon from '@mdi/react';
-import { mdiPencil, mdiPlusCircleOutline } from '@mdi/js';
+import { mdiPlusCircleOutline } from '@mdi/js';
 
 import './Sidebar.css';
 
-import AddFeedForm from './AddFeedForm';
-import AddTopicForm from './AddTopicForm';
 import MenuItem from './MenuItem';
 import { getFeeds, getTopics } from '../utils/http';
 import {
@@ -16,6 +14,7 @@ import {
     setSavedFilter,
     setTopicFilter,
 } from '../actions/filters';
+import { addFeed, addTopic } from '../actions/modal';
 
 
 class Sidebar extends React.Component {
@@ -33,7 +32,7 @@ class Sidebar extends React.Component {
         this.state.feeds.map(feed => (
             <MenuItem
                 key={feed.id}
-                active={this.props.filters.feedId === feed.id}
+                isActive={this.props.filters.feedId === feed.id}
                 filterFn={this.props.setFeedFilter}
                 {...feed}
             />
@@ -43,7 +42,7 @@ class Sidebar extends React.Component {
         this.state.topics.map(topic => (
             <MenuItem
                 key={topic.id}
-                active={this.props.filters.topicId === topic.id}
+                isActive={this.props.filters.topicId === topic.id}
                 filterFn={this.props.setTopicFilter}
                 {...topic}
             />
@@ -73,14 +72,7 @@ class Sidebar extends React.Component {
                         <span className={'menu-label'}>Topics</span>
                         <button
                             className={'add-button'}
-                            onClick={() =>
-                                this.props.openModal(
-                                    <AddTopicForm
-                                        close={this.props.closeModal}
-                                        topics={this.state.topics}
-                                    />
-                                )
-                            }
+                            onClick={() => this.props.addTopic(this.state.topics)}
                         >
                             <Icon path={mdiPlusCircleOutline} size={0.65}/>
                         </button>
@@ -90,13 +82,7 @@ class Sidebar extends React.Component {
                         <span className={'menu-label'}>Feeds</span>
                         <button
                             className={'add-button'}
-                            onClick={() =>
-                                this.props.openModal(
-                                    <AddFeedForm
-                                        close={this.props.closeModal}
-                                    />
-                                )
-                            }
+                            onClick={this.props.addFeed}
                         >
                             <Icon path={mdiPlusCircleOutline} size={0.65}/>
                         </button>
@@ -114,5 +100,12 @@ const mapStateToProps = state => ({ filters: state.filters });
 
 export default connect(
     mapStateToProps,
-    { setFeedFilter, setSavedFilter, setTopicFilter, clearFilters }
+    {
+        addFeed,
+        addTopic,
+        setFeedFilter,
+        setSavedFilter,
+        setTopicFilter,
+        clearFilters
+    }
 )(Sidebar);

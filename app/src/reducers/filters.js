@@ -6,7 +6,7 @@ import {
 } from '../actions/filters';
 
 
-const filters = (state={ filters: null }, action) => {
+const filters = (state={}, action) => {
     switch (action.type) {
         case CLEAR_FILTERS:
             return {};

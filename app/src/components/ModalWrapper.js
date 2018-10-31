@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import {
     Modal,
     ModalBackground,
@@ -6,14 +7,37 @@ import {
     ModalClose
 } from 'bloomer';
 
+import {
+    ADD_FEED,
+    ADD_TOPIC,
+    close
+} from '../actions/modal';
+import AddFeedForm from '../components/AddFeedForm';
+import AddTopicForm from '../components/AddTopicForm';
+
 
 const ModalWrapper = (props) => (
-    <Modal isActive={props.isActive}>
+    <Modal isActive={props.modal.isActive}>
         <ModalBackground onClick={props.close}/>
-        <ModalContent>{props.form}</ModalContent>
+        <ModalContent>
+            {(() => {
+                switch (props.modal.type) {
+                    case ADD_FEED:
+                        return <AddFeedForm/>;
+                    case ADD_TOPIC:
+                        return <AddTopicForm {...props.modal.formProps}/>;
+                }
+            })()}
+        </ModalContent>
         <ModalClose onClick={props.close}/>
     </Modal>
 );
 
-export default ModalWrapper;
 
+const mapStateToProps = state => ({ modal: state.modal });
+
+
+export default connect(
+    mapStateToProps,
+    { close }
+)(ModalWrapper);
