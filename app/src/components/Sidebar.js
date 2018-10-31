@@ -8,6 +8,7 @@ import './Sidebar.css';
 
 import AddFeedForm from './AddFeedForm';
 import AddTopicForm from './AddTopicForm';
+import MenuItem from './MenuItem';
 import { getFeeds, getTopics } from '../utils/http';
 import {
     clearFilters,
@@ -30,36 +31,22 @@ class Sidebar extends React.Component {
 
     renderFeeds = () =>
         this.state.feeds.map(feed => (
-            <li key={feed.id}>
-                <div className={'menu-item'}>
-                    <MenuLink
-                        className={this.props.filters.feedId === feed.id ? 'is-active': ''}
-                        onClick={() => this.props.setFeedFilter(feed.id)}
-                    >
-                        { feed.title }
-                    </MenuLink>
-                    <button className={'edit-button'}>
-                        <Icon path={mdiPencil} size={0.65}/>
-                    </button>
-                </div>
-            </li>
+            <MenuItem
+                key={feed.id}
+                active={this.props.filters.feedId === feed.id}
+                filterFn={this.props.setFeedFilter}
+                {...feed}
+            />
         ));
 
     renderTopics = () =>
         this.state.topics.map(topic => (
-            <li key={topic.id}>
-                <div className={'menu-item'}>
-                    <MenuLink
-                        className={this.props.filters.topicId === topic.id ? 'is-active': ''}
-                        onClick={() => this.props.setTopicFilter(topic.id)}
-                    >
-                        {topic.name}
-                    </MenuLink>
-                    <button className={'edit-button'}>
-                        <Icon path={mdiPencil} size={0.65}/>
-                    </button>
-                </div>
-            </li>
+            <MenuItem
+                key={topic.id}
+                active={this.props.filters.topicId === topic.id}
+                filterFn={this.props.setTopicFilter}
+                {...topic}
+            />
         ));
 
     render() {

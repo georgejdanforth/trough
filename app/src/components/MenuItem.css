@@ -1,0 +1,27 @@
+.menu-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.menu-item button {
+    padding-top: 10px;
+    border: none;
+    outline: none;
+    background: none;
+    cursor: pointer;
+    visibility: hidden;
+}
+
+.menu-item:hover button.edit-button {
+    visibility: visible;
+}
+
+button.edit-button svg {
+    fill: lightgray;
+}
+
+button.edit-button:hover svg {
+    fill: white;
+}
