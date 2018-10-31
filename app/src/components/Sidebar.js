@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Menu, MenuLink, MenuList } from 'bloomer';
 import Icon from '@mdi/react';
-import { mdiPlusCircleOutline } from '@mdi/js';
+import { mdiPencil, mdiPlusCircleOutline } from '@mdi/js';
 
 import './Sidebar.css';
 
@@ -31,24 +31,34 @@ class Sidebar extends React.Component {
     renderFeeds = () =>
         this.state.feeds.map(feed => (
             <li key={feed.id}>
-                <MenuLink
-                    className={this.props.filters.feedId === feed.id ? 'is-active': ''}
-                    onClick={() => this.props.setFeedFilter(feed.id)}
-                >
-                    { feed.title }
-                </MenuLink>
+                <div className={'menu-item'}>
+                    <MenuLink
+                        className={this.props.filters.feedId === feed.id ? 'is-active': ''}
+                        onClick={() => this.props.setFeedFilter(feed.id)}
+                    >
+                        { feed.title }
+                    </MenuLink>
+                    <button className={'edit-button'}>
+                        <Icon path={mdiPencil} size={0.65}/>
+                    </button>
+                </div>
             </li>
         ));
 
     renderTopics = () =>
         this.state.topics.map(topic => (
             <li key={topic.id}>
-                <MenuLink
-                    className={this.props.filters.topicId === topic.id ? 'is-active': ''}
-                    onClick={() => this.props.setTopicFilter(topic.id)}
-                >
-                    {topic.name}
-                </MenuLink>
+                <div className={'menu-item'}>
+                    <MenuLink
+                        className={this.props.filters.topicId === topic.id ? 'is-active': ''}
+                        onClick={() => this.props.setTopicFilter(topic.id)}
+                    >
+                        {topic.name}
+                    </MenuLink>
+                    <button className={'edit-button'}>
+                        <Icon path={mdiPencil} size={0.65}/>
+                    </button>
+                </div>
             </li>
         ));
 
