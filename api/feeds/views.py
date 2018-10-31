@@ -16,6 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from api.extensions import db
 from api.feeds import constants
 from api.feeds.models import (
+    custom_topic_feed,
     CustomTopic,
     Feed,
     FeedItem
@@ -61,7 +62,8 @@ def get_feeds():
 @receives_query_params
 def get_feed_items(page):
     user = User.query.filter_by(id=get_jwt_identity()).one()
-    if request.query_params.get('saved'):
+
+    if 'saved' in request.query_params:
         return Responses.json_response((
             feed_item.to_dict(user=user)
             for feed_item in sorted(
@@ -71,20 +73,37 @@ def get_feed_items(page):
             )
         ))
 
-    return Responses.json_response((
-        feed_item.to_dict(user=user)
-        for feed_item in (
-            FeedItem
-            .query
-            .join(Feed, Feed.id == FeedItem.feed_id)
-            .join(user_feed, Feed.id == user_feed.c.feed_id)
-            .filter(user_feed.c.user_id == user.id)
-            .filter_by(**request.query_params)
-            .order_by(FeedItem.pubdate.desc())
-            .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
-            .items
-        )
-    ))
+    elif 'topic_id' in request.query_params:
+        topic_id = request.query_params['topic_id']
+        return Responses.json_response((
+            feed_item.to_dict(user=user)
+            for feed_item in (
+                FeedItem
+                .query
+                .join(Feed, Feed.id == FeedItem.feed_id)
+                .join(custom_topic_feed, Feed.id == custom_topic_feed.c.feed_id)
+                .filter(custom_topic_feed.c.custom_topic_id == topic_id)
+                .order_by(FeedItem.pubdate.desc())
+                .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
+                .items
+            )
+        ))
+
+    else:
+        return Responses.json_response((
+            feed_item.to_dict(user=user)
+            for feed_item in (
+                FeedItem
+                .query
+                .join(Feed, Feed.id == FeedItem.feed_id)
+                .join(user_feed, Feed.id == user_feed.c.feed_id)
+                .filter(user_feed.c.user_id == user.id)
+                .filter_by(**request.query_params)
+                .order_by(FeedItem.pubdate.desc())
+                .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
+                .items
+            )
+        ))
 
 
 @feeds.route('/isvalid', methods=['GET'])
