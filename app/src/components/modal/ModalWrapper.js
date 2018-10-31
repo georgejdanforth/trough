@@ -11,9 +11,9 @@ import {
     ADD_FEED,
     ADD_TOPIC,
     close
-} from '../actions/modal';
-import AddFeedForm from '../components/AddFeedForm';
-import AddTopicForm from '../components/AddTopicForm';
+} from '../../actions/modal';
+import AddFeedForm from './AddFeedForm';
+import AddTopicForm from './AddTopicForm';
 
 
 const ModalWrapper = (props) => (

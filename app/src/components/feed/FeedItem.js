@@ -5,7 +5,7 @@ import { Icon } from '@mdi/react';
 import moment from 'moment';
 
 import './FeedItem.css';
-import { saveFeedItem, unsaveFeedItem } from '../utils/http';
+import { saveFeedItem, unsaveFeedItem } from '../../utils/http';
 
 const MAX_WORDS = 100;
 

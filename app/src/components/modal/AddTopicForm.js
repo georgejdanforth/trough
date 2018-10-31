@@ -4,12 +4,11 @@ import {
     Button,
     Control,
     Field,
-    Icon as FormIcon,
     Input,
     Label,
 } from 'bloomer';
 
-import { addTopic } from '../utils/http';
+import { addTopic } from '../../utils/http';
 
 
 const MIN_NAME_LENGTH = 1;

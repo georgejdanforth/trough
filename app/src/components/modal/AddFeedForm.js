@@ -12,7 +12,7 @@ import { mdiLoading } from '@mdi/js';
 import { Icon } from '@mdi/react';
 import { isWebUri } from 'valid-url';
 
-import { addFeed, validateFeed } from '../utils/http';
+import { addFeed, validateFeed } from '../../utils/http';
 
 
 export default class AddFeedForm extends React.Component {

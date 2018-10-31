@@ -7,14 +7,14 @@ import { mdiPlusCircleOutline } from '@mdi/js';
 import './Sidebar.css';
 
 import MenuItem from './MenuItem';
-import { getFeeds, getTopics } from '../utils/http';
+import { getFeeds, getTopics } from '../../utils/http';
 import {
     clearFilters,
     setFeedFilter,
     setSavedFilter,
     setTopicFilter,
-} from '../actions/filters';
-import { addFeed, addTopic } from '../actions/modal';
+} from '../../actions/filters';
+import { addFeed, addTopic } from '../../actions/modal';
 
 
 class Sidebar extends React.Component {

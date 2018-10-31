@@ -1,14 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-    Container,
-    Content,
-} from 'bloomer';
+import { Container } from 'bloomer';
 
 import './Feed.css';
 
 import FeedItem from './FeedItem';
-import { getFeedItems } from '../utils/http';
+import { getFeedItems } from '../../utils/http';
 
 
 class Feed extends React.Component {

@@ -1,14 +1,13 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import {
     Column,
     Columns,
 } from 'bloomer';
 
 import './Main.css';
-import ModalWrapper from './ModalWrapper';
-import Feed from './Feed';
-import Sidebar from './Sidebar';
+import ModalWrapper from './modal/ModalWrapper';
+import Feed from './feed/Feed';
+import Sidebar from './sidebar/Sidebar';
 
 
 const Main = () => (
