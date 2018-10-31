@@ -12,7 +12,8 @@ import { getFeeds, getTopics } from '../utils/http';
 import {
     clearFilters,
     setFeedFilter,
-    setSavedFilter
+    setSavedFilter,
+    setTopicFilter,
 } from '../actions/filters';
 
 
@@ -41,7 +42,14 @@ class Sidebar extends React.Component {
 
     renderTopics = () =>
         this.state.topics.map(topic => (
-            <li key={topic.id}><MenuLink>{topic.name}</MenuLink></li>
+            <li key={topic.id}>
+                <MenuLink
+                    className={this.props.filters.topicId === topic.id ? 'is-active': ''}
+                    onClick={() => this.props.setTopicFilter(topic.id)}
+                >
+                    {topic.name}
+                </MenuLink>
+            </li>
         ));
 
     render() {
@@ -109,5 +117,5 @@ const mapStateToProps = state => ({ filters: state.filters });
 
 export default connect(
     mapStateToProps,
-    { setFeedFilter, setSavedFilter, clearFilters }
+    { setFeedFilter, setSavedFilter, setTopicFilter, clearFilters }
 )(Sidebar);
