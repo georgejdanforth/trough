@@ -60,8 +60,8 @@ export const saveFeedItem = refresh(feedItemId =>
 export const unsaveFeedItem = refresh(feedItemId =>
     axios.delete(`${BASE_URL}/feeds/unsave/${feedItemId}`, getAccessConfig()));
 
-export const getTopics = refresh(() =>
-    axios.get(`${BASE_URL}/feeds/topics`, getAccessConfig()));
+export const getTopics = refresh(exclude =>
+    axios.get(`${BASE_URL}/feeds/topics?${exclude ? `exclude=${exclude}`: ''}`, getAccessConfig()));
 
 export const addTopic = refresh(name =>
     axios.post(`${BASE_URL}/feeds/topics/add`, { name }, getAccessConfig()));

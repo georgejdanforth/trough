@@ -184,14 +184,17 @@ def remove_saved_feed_item(feed_item_id):
 @feeds.route('/topics', methods=['GET'])
 @cross_origin()
 @jwt_required
+@receives_query_params
 def get_custom_topics():
+    exclude = request.query_params.get('exclude')
     return Responses.json_response((
         custom_topic.to_dict() for custom_topic in (
-            User
+            CustomTopic
             .query
-            .filter_by(id=get_jwt_identity())
-            .one()
-            .custom_topics
+            .filter(
+                CustomTopic.user_id == get_jwt_identity(),
+                ~CustomTopic.feeds.any(Feed.id == exclude)
+            ).all()
         )
     ))
 

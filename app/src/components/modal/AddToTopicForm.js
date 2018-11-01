@@ -9,13 +9,18 @@ import {
 import classNames from 'classnames/bind';
 
 import './AddToTopicForm.css';
-import { addToTopics } from '../../utils/http';
+import { addToTopics, getTopics } from '../../utils/http';
 
 
 export default class AddToTopicForm extends React.Component {
     state = {
+        topics: [],
         addedTopicIds: []
     };
+
+    componentDidMount() {
+        getTopics(this.props.feed.id).then(({data}) => this.setState({ topics: data }));
+    }
 
     toggleAddedTopicId = topicId => {
         if (this.state.addedTopicIds.includes(topicId)) {
@@ -31,7 +36,7 @@ export default class AddToTopicForm extends React.Component {
 
 
     renderTopics = () =>
-        this.props.topics.map(topic => {
+        this.state.topics.map(topic => {
             const classes = classNames(
                 'topic-button',
                 {'topic-selected': this.state.addedTopicIds.includes(topic.id)}

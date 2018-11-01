@@ -13,9 +13,9 @@ export const addTopic = topics => ({
     formProps: { topics }
 });
 
-export const addToTopic = (feed, topics) => ({
+export const addToTopic = feed => ({
     type: ADD_TO_TOPIC,
-    formProps: { feed, topics }
+    formProps: { feed }
 });
 
 export const close = () => ({

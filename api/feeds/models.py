@@ -72,3 +72,5 @@ class CustomTopic(BaseModel, Serializable):
 
     name = db.Column(TEXT, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    feeds = db.relationship('Feed', secondary=custom_topic_feed)
