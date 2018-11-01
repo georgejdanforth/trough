@@ -65,3 +65,6 @@ export const getTopics = refresh(() =>
 
 export const addTopic = refresh(name =>
     axios.post(`${BASE_URL}/feeds/topics/add`, { name }, getAccessConfig()));
+
+export const addToTopics = refresh((topicIds, feedId) =>
+    axios.post(`${BASE_URL}/feeds/topics/addto`, { topicIds, feedId }, getAccessConfig()));
