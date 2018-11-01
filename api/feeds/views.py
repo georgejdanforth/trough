@@ -11,6 +11,7 @@ from flask_jwt_extended import (
 )
 from operator import methodcaller
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import load_only
 from sqlalchemy.orm.exc import NoResultFound
 
 from api.extensions import db
@@ -32,6 +33,7 @@ from api.userdata.models import (
 )
 from api.utils import (
     Responses,
+    flatten,
     receives_json,
     receives_query_params
 )
@@ -199,6 +201,7 @@ def get_custom_topics():
 @jwt_required
 @receives_json
 def add_custom_topic():
+    # noinspection PyArgumentList
     topic = CustomTopic(
         name=request.json_data.get('name'),
         user_id=get_jwt_identity()
@@ -206,5 +209,40 @@ def add_custom_topic():
 
     db.session.add(topic)
     db.session.commit()
+
+    return Responses.ok()
+
+
+@feeds.route('/topics/addto', methods=['POST'])
+@cross_origin()
+@jwt_required
+@receives_json
+def add_to_custom_topic():
+
+    feed_id = request.json_data.get('feed_id')
+    custom_topic_ids = flatten(
+        CustomTopic
+        .query
+        .filter(
+            CustomTopic.id.in_(request.json_data.get('topic_ids', [])),
+            CustomTopic.user_id == get_jwt_identity()
+        )
+        .with_entities(CustomTopic.id)
+        .all()
+    )
+
+    try:
+        db.session.execute(
+            custom_topic_feed
+            .insert()
+            .values([
+                {'custom_topic_id': custom_topic_id, 'feed_id': feed_id}
+                for custom_topic_id in custom_topic_ids
+            ])
+        )
+
+        db.session.commit()
+    except IntegrityError:
+        pass
 
     return Responses.ok()

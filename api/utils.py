@@ -108,3 +108,7 @@ def receives_query_params(endpoint):
         return endpoint(*args, **kwargs)
 
     return wrapper
+
+
+def flatten(_list):
+    return [item for sublist in _list for item in sublist]
