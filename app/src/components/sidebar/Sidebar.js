@@ -14,7 +14,11 @@ import {
     setSavedFilter,
     setTopicFilter,
 } from '../../actions/filters';
-import { addFeed, addTopic } from '../../actions/modal';
+import {
+    addFeed,
+    addTopic,
+    addToTopic
+} from '../../actions/modal';
 
 
 class Sidebar extends React.Component {
@@ -32,6 +36,7 @@ class Sidebar extends React.Component {
         this.state.feeds.map(feed => (
             <MenuItem
                 key={feed.id}
+                addToTopic={() => this.props.addToTopic(feed, this.state.topics)}
                 isActive={this.props.filters.feedId === feed.id}
                 filterFn={this.props.setFeedFilter}
                 {...feed}
@@ -103,6 +108,7 @@ export default connect(
     {
         addFeed,
         addTopic,
+        addToTopic,
         setFeedFilter,
         setSavedFilter,
         setTopicFilter,

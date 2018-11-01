@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import {
     Dropdown,
     DropdownContent,
@@ -36,7 +37,11 @@ class MenuItem extends React.Component {
                         </DropdownTrigger>
                         <DropdownMenu>
                             <DropdownContent>
-                                <DropdownItem>Add to topic</DropdownItem>
+                                <DropdownItem
+                                    onClick={this.props.addToTopic}
+                                >
+                                    Add to topic
+                                </DropdownItem>
                                 <DropdownItem>Delete</DropdownItem>
                             </DropdownContent>
                         </DropdownMenu>
@@ -47,4 +52,4 @@ class MenuItem extends React.Component {
     }
 }
 
-export default MenuItem;
+export default connect()(MenuItem);
