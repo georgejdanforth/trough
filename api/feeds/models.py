@@ -8,6 +8,10 @@ from api.models import (
     BaseModel,
     Serializable
 )
+from api.userdata.models import (
+    User,
+    user_feed
+)
 
 
 custom_topic_feed = db.Table(
@@ -27,6 +31,15 @@ class Feed(BaseModel, Serializable):
     title = db.Column(TEXT, nullable=False)
     feed_type = db.Column(db.Integer, nullable=False)
     last_processed = db.Column(db.DateTime)
+
+    @classmethod
+    def for_user(cls, user):
+        user_id = user.id if isinstance(user, User) else user
+        return (
+            cls.query
+            .join(user_feed, user_feed.c.feed_id == cls.id)
+            .filter(user_feed.c.user_id == user_id)
+        )
 
 
 class FeedItem(BaseModel, Serializable):
@@ -74,3 +87,9 @@ class CustomTopic(BaseModel, Serializable):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     feeds = db.relationship('Feed', secondary=custom_topic_feed)
+
+    @classmethod
+    def for_user(cls, user):
+        return cls.query.filter(
+            cls.user_id == (user.id if isinstance(user, User) else user)
+        )

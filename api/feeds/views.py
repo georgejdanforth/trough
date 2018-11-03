@@ -1,3 +1,4 @@
+import itertools
 import requests
 
 from flask import (
@@ -11,7 +12,6 @@ from flask_jwt_extended import (
 )
 from operator import methodcaller
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import load_only
 from sqlalchemy.orm.exc import NoResultFound
 
 from api.extensions import db
@@ -45,16 +45,30 @@ feeds = Blueprint('feeds', __name__, url_prefix='/feeds')
 @feeds.route('/feeds', methods=['GET'])
 @cross_origin()
 @jwt_required
+@receives_query_params
 def get_feeds():
-    return Responses.json_response(
-        map(
-            methodcaller('to_dict'),
-            Feed
-            .query
-            .join(user_feed, user_feed.c.feed_id == Feed.id)
-            .filter(user_feed.c.user_id == get_jwt_identity())
-            .all()
+    for_topic = request.query_params.get('for_topic')
+    if for_topic:
+        topic_feeds = (
+            db.session
+            .query(custom_topic_feed)
+            .filter(custom_topic_feed.c.custom_topic_id == for_topic)
+            .subquery()
         )
+
+        return Responses.json_response((
+            {'added': bool(topic_id), **feed.to_dict()} for feed, topic_id in (
+                db.session
+                .query(Feed, topic_feeds.c.custom_topic_id)
+                .join(user_feed, user_feed.c.feed_id == Feed.id)
+                .filter(user_feed.c.user_id == get_jwt_identity())
+                .outerjoin(topic_feeds, topic_feeds.c.feed_id == Feed.id)
+                .all()
+            )
+        ))
+
+    return Responses.json_response(
+        map(methodcaller('to_dict'), Feed.for_user(get_jwt_identity()).all())
     )
 
 
@@ -220,32 +234,49 @@ def add_custom_topic():
 @cross_origin()
 @jwt_required
 @receives_json
-def add_to_custom_topic():
+def add_to_custom_topics():
 
-    feed_id = request.json_data.get('feed_id')
+    user_id = get_jwt_identity()
+
     custom_topic_ids = flatten(
-        CustomTopic
-        .query
-        .filter(
-            CustomTopic.id.in_(request.json_data.get('topic_ids', [])),
-            CustomTopic.user_id == get_jwt_identity()
-        )
+        CustomTopic.for_user(user_id)
+        .filter(CustomTopic.id.in_(request.json_data.get('topic_ids', [])))
         .with_entities(CustomTopic.id)
         .all()
     )
 
-    try:
-        db.session.execute(
-            custom_topic_feed
-            .insert()
-            .values([
-                {'custom_topic_id': custom_topic_id, 'feed_id': feed_id}
-                for custom_topic_id in custom_topic_ids
-            ])
-        )
+    feed_ids = flatten(
+        Feed.for_user(user_id)
+        .filter(Feed.id.in_(request.json_data.get('feed_ids', [])))
+        .with_entities(Feed.id)
+        .all()
+    )
 
-        db.session.commit()
-    except IntegrityError:
-        pass
+    existing = db.session.query(custom_topic_feed).filter(
+        custom_topic_feed.c.custom_topic_id.in_(custom_topic_ids),
+        custom_topic_feed.c.feed_id.in_(feed_ids),
+    ).all()
+
+    to_add = list(set(itertools.product(custom_topic_ids, feed_ids)) - set(existing))
+
+    if existing:
+        try:
+            custom_topic_ids, feed_ids = zip(*existing)
+            db.session.execute(
+                custom_topic_feed
+                .delete()
+                .where(custom_topic_feed.c.custom_topic_id.in_(custom_topic_ids))
+                .where(custom_topic_feed.c.feed_id.in_(feed_ids))
+            )
+            db.session.commit()
+        except IntegrityError:
+            pass
+
+    if to_add:
+        try:
+            db.session.execute(custom_topic_feed.insert().values(to_add))
+            db.session.commit()
+        except IntegrityError:
+            pass
 
     return Responses.ok()
