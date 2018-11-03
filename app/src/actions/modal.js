@@ -1,6 +1,6 @@
 export const ADD_FEED = 'ADD_FEED';
 export const ADD_TOPIC = 'ADD_TOPIC';
-export const ADD_TO_TOPICS = 'ADD_TO_TOPICS';
+export const MANAGE_FEED_TOPICS = 'MANAGE_FEED_TOPICS';
 export const MANAGE_TOPIC_FEEDS = 'MANAGE_TOPIC_FEEDS';
 export const CLOSE = 'CLOSE';
 
@@ -14,8 +14,8 @@ export const addTopic = topics => ({
     formProps: { topics }
 });
 
-export const addToTopics = feed => ({
-    type: ADD_TO_TOPICS,
+export const manageFeedTopics = feed => ({
+    type: MANAGE_FEED_TOPICS,
     formProps: { feed }
 });
 

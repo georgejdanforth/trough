@@ -200,16 +200,27 @@ def remove_saved_feed_item(feed_item_id):
 @jwt_required
 @receives_query_params
 def get_custom_topics():
-    exclude = request.query_params.get('exclude')
-    return Responses.json_response((
-        custom_topic.to_dict() for custom_topic in (
-            CustomTopic
-            .query
-            .filter(
-                CustomTopic.user_id == get_jwt_identity(),
-                ~CustomTopic.feeds.any(Feed.id == exclude)
-            ).all()
+    for_feed = request.query_params.get('for_feed')
+    if for_feed:
+        topic_feeds = (
+            db.session
+            .query(custom_topic_feed)
+            .filter(custom_topic_feed.c.feed_id == for_feed)
+            .subquery()
         )
+
+        return Responses.json_response((
+            {'added': bool(feed_id), **topic.to_dict()} for topic, feed_id in (
+                db.session
+                .query(CustomTopic, topic_feeds.c.feed_id)
+                .filter(CustomTopic.user_id == get_jwt_identity())
+                .outerjoin(topic_feeds, topic_feeds.c.custom_topic_id == CustomTopic.id)
+                .all()
+            )
+        ))
+
+    return Responses.json_response((
+        map(methodcaller('to_dict'), CustomTopic.for_user(get_jwt_identity()).all())
     ))
 
 
@@ -230,11 +241,11 @@ def add_custom_topic():
     return Responses.ok()
 
 
-@feeds.route('/topics/addto', methods=['POST'])
+@feeds.route('/topics/manage', methods=['POST'])
 @cross_origin()
 @jwt_required
 @receives_json
-def add_to_custom_topics():
+def manage_custom_topics():
 
     user_id = get_jwt_identity()
 

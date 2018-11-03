@@ -29,8 +29,8 @@ class MenuItem extends React.Component {
         ],
         'feed': [
             {
-                label: 'Add to topics',
-                onClick: this.props.addToTopics
+                label: 'Manage topics',
+                onClick: this.props.manageFeedTopics
             },
             {
                 label: 'Unfollow',

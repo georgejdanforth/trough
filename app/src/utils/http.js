@@ -60,11 +60,11 @@ export const saveFeedItem = refresh(feedItemId =>
 export const unsaveFeedItem = refresh(feedItemId =>
     axios.delete(`${BASE_URL}/feeds/unsave/${feedItemId}`, getAccessConfig()));
 
-export const getTopics = refresh(exclude =>
-    axios.get(`${BASE_URL}/feeds/topics?${exclude ? `exclude=${exclude}`: ''}`, getAccessConfig()));
+export const getTopics = refresh(forFeed =>
+    axios.get(`${BASE_URL}/feeds/topics?${forFeed ? `forFeed=${forFeed}`: ''}`, getAccessConfig()));
 
 export const addTopic = refresh(name =>
     axios.post(`${BASE_URL}/feeds/topics/add`, { name }, getAccessConfig()));
 
-export const addToTopics = refresh((topicIds, feedIds) =>
-    axios.post(`${BASE_URL}/feeds/topics/addto`, { topicIds, feedIds }, getAccessConfig()));
+export const manageTopics = refresh((topicIds, feedIds) =>
+    axios.post(`${BASE_URL}/feeds/topics/manage`, { topicIds, feedIds }, getAccessConfig()));
