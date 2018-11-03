@@ -1,6 +1,7 @@
 import {
     ADD_FEED,
     ADD_TOPIC,
+    DELETE_ITEM,
     MANAGE_FEED_TOPICS,
     MANAGE_TOPIC_FEEDS,
     CLOSE,
@@ -32,6 +33,12 @@ const modal = (state={isActive: false, formProps: {}, type: null}, action) => {
                 isActive: true,
                 formProps: action.formProps,
                 type: MANAGE_TOPIC_FEEDS
+            };
+        case DELETE_ITEM:
+            return {
+                isActive: true,
+                formProps: action.formProps,
+                type: DELETE_ITEM
             };
         case CLOSE:
             return {

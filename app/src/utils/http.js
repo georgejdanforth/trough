@@ -68,3 +68,9 @@ export const addTopic = refresh(name =>
 
 export const manageTopics = refresh((topicIds, feedIds) =>
     axios.post(`${BASE_URL}/feeds/topics/manage`, { topicIds, feedIds }, getAccessConfig()));
+
+export const deleteTopic = refresh(topicId =>
+    axios.delete(`${BASE_URL}/feeds/topics/delete/${topicId}`, getAccessConfig()));
+
+export const unfollowFeed = refresh(feedId =>
+    axios.delete(`${BASE_URL}/feeds/unfollow/${feedId}`, getAccessConfig()));

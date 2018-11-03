@@ -24,7 +24,7 @@ class MenuItem extends React.Component {
             },
             {
                 label: 'Delete',
-                onClick: () => null
+                onClick: this.props.deleteItem
             }
         ],
         'feed': [
@@ -34,7 +34,7 @@ class MenuItem extends React.Component {
             },
             {
                 label: 'Unfollow',
-                onClick: () => null
+                onClick: this.props.deleteItem
             }
         ],
     }[this.props.type]);

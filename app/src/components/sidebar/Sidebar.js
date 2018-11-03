@@ -17,6 +17,7 @@ import {
 import {
     addFeed,
     addTopic,
+    deleteItem,
     manageFeedTopics,
     manageTopicFeeds
 } from '../../actions/modal';
@@ -39,6 +40,7 @@ class Sidebar extends React.Component {
                 key={feed.id}
                 type={'feed'}
                 manageFeedTopics={() => this.props.manageFeedTopics(feed)}
+                deleteItem={() => this.props.deleteItem('feed', feed)}
                 isActive={this.props.filters.feedId === feed.id}
                 filterFn={this.props.setFeedFilter}
                 {...feed}
@@ -51,6 +53,7 @@ class Sidebar extends React.Component {
                 key={topic.id}
                 type={'topic'}
                 manageTopicFeeds={() => this.props.manageTopicFeeds(topic)}
+                deleteItem={() => this.props.deleteItem('topic', topic)}
                 isActive={this.props.filters.topicId === topic.id}
                 filterFn={this.props.setTopicFilter}
                 {...topic}
@@ -112,6 +115,7 @@ export default connect(
     {
         addFeed,
         addTopic,
+        deleteItem,
         manageFeedTopics,
         manageTopicFeeds,
         setFeedFilter,

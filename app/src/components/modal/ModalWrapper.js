@@ -10,6 +10,7 @@ import {
 import {
     ADD_FEED,
     ADD_TOPIC,
+    DELETE_ITEM,
     MANAGE_FEED_TOPICS,
     MANAGE_TOPIC_FEEDS,
     close
@@ -17,6 +18,7 @@ import {
 
 import AddFeedForm from './AddFeedForm';
 import AddTopicForm from './AddTopicForm';
+import DeleteItemForm from './DeleteItemForm';
 import ManageFeedTopicsForm from './ManageFeedTopicsForm';
 import ManageTopicFeedsForm from './ManageTopicFeedsForm';
 
@@ -34,6 +36,11 @@ const ModalWrapper = (props) => (
                             close={props.close}
                             {...props.modal.formProps}
                         />;
+                    case DELETE_ITEM:
+                        return <DeleteItemForm
+                            close={props.close}
+                            {...props.modal.formProps}
+                        />
                     case MANAGE_FEED_TOPICS:
                         return <ManageFeedTopicsForm
                             close={props.close}

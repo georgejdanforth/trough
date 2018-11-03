@@ -1,0 +1,26 @@
+.delete-text {
+    text-align: center;
+    padding: 1em;
+}
+
+.delete-control {
+    text-align: center;
+}
+
+button.cancel-button {
+    margin-left: .5em;
+    margin-right: .5em;
+    width: 8em;
+}
+
+button.delete-button {
+    margin-left: .5em;
+    margin-right: .5em;
+    width: 8em;
+    background: gray;
+    color: white;
+}
+
+button.delete-button:hover {
+    color: white;
+}
