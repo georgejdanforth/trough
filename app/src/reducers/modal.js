@@ -2,6 +2,7 @@ import {
     ADD_FEED,
     ADD_TOPIC,
     ADD_TO_TOPICS,
+    MANAGE_TOPIC_FEEDS,
     CLOSE,
 } from '../actions/modal';
 
@@ -25,6 +26,12 @@ const modal = (state={isActive: false, formProps: {}, type: null}, action) => {
                 isActive: true,
                 formProps: action.formProps,
                 type: ADD_TO_TOPICS
+            };
+        case MANAGE_TOPIC_FEEDS:
+            return {
+                isActive: true,
+                formProps: action.formProps,
+                type: MANAGE_TOPIC_FEEDS
             };
         case CLOSE:
             return {

@@ -20,7 +20,7 @@ class MenuItem extends React.Component {
         'topic': [
             {
                 label: 'Manage feeds',
-                onClick: () => null
+                onClick: this.props.manageTopicFeeds
             },
             {
                 label: 'Delete',

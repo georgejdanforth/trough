@@ -11,11 +11,14 @@ import {
     ADD_FEED,
     ADD_TOPIC,
     ADD_TO_TOPICS,
+    MANAGE_TOPIC_FEEDS,
     close
 } from '../../actions/modal';
+
 import AddFeedForm from './AddFeedForm';
 import AddTopicForm from './AddTopicForm';
 import AddToTopicForm from './AddToTopicForm';
+import ManageTopicFeedsForm from './ManageTopicFeedsForm';
 
 
 const ModalWrapper = (props) => (
@@ -33,6 +36,11 @@ const ModalWrapper = (props) => (
                         />;
                     case ADD_TO_TOPICS:
                         return <AddToTopicForm
+                            close={props.close}
+                            {...props.modal.formProps}
+                        />;
+                    case MANAGE_TOPIC_FEEDS:
+                        return <ManageTopicFeedsForm
                             close={props.close}
                             {...props.modal.formProps}
                         />;

@@ -17,7 +17,8 @@ import {
 import {
     addFeed,
     addTopic,
-    addToTopics
+    addToTopics,
+    manageTopicFeeds
 } from '../../actions/modal';
 
 
@@ -49,6 +50,7 @@ class Sidebar extends React.Component {
             <MenuItem
                 key={topic.id}
                 type={'topic'}
+                manageTopicFeeds={() => this.props.manageTopicFeeds(topic)}
                 isActive={this.props.filters.topicId === topic.id}
                 filterFn={this.props.setTopicFilter}
                 {...topic}
@@ -111,6 +113,7 @@ export default connect(
         addFeed,
         addTopic,
         addToTopics,
+        manageTopicFeeds,
         setFeedFilter,
         setSavedFilter,
         setTopicFilter,

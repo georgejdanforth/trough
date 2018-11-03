@@ -6,6 +6,12 @@ import './ToggleMenu.css';
 
 
 export default class ToggleMenu extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            addedItemIds: props.items.filter(item => item.added).map(item => item.id)
+        };
+    }
     state = {
         addedItemIds: []
     };

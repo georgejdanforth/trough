@@ -42,8 +42,8 @@ const filtersToQueryParams = filters =>
 export const login = creds =>
     axios.post(`${BASE_URL}/userdata/login`, creds, getAccessConfig());
 
-export const getFeeds = refresh(() =>
-    axios.get(`${BASE_URL}/feeds/feeds`, getAccessConfig()));
+export const getFeeds = refresh(forTopic =>
+    axios.get(`${BASE_URL}/feeds/feeds?${forTopic ? `forTopic=${forTopic}` : ''}`, getAccessConfig()));
 
 export const getFeedItems = refresh(filters =>
     axios.get(`${BASE_URL}/feeds/feeditems/1?${filtersToQueryParams(filters)}`, getAccessConfig()));
@@ -66,5 +66,5 @@ export const getTopics = refresh(exclude =>
 export const addTopic = refresh(name =>
     axios.post(`${BASE_URL}/feeds/topics/add`, { name }, getAccessConfig()));
 
-export const addToTopics = refresh((topicIds, feedId) =>
-    axios.post(`${BASE_URL}/feeds/topics/addto`, { topicIds, feedId }, getAccessConfig()));
+export const addToTopics = refresh((topicIds, feedIds) =>
+    axios.post(`${BASE_URL}/feeds/topics/addto`, { topicIds, feedIds }, getAccessConfig()));
