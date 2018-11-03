@@ -160,6 +160,25 @@ def add_feed():
     return Responses.ok()
 
 
+@feeds.route('/unfollow/<int:feed_id>', methods=['DELETE'])
+@cross_origin()
+@jwt_required
+def unfollow_feed(feed_id):
+    try:
+        db.session.execute(
+            user_feed
+            .delete()
+            .where(user_feed.c.user_id == get_jwt_identity())
+            .where(user_feed.c.feed_id == feed_id)
+        )
+
+        db.session.commit()
+    except IntegrityError:
+        pass
+
+    return Responses.ok()
+
+
 @feeds.route('/save/<int:feed_item_id>', methods=['POST'])
 @cross_origin()
 @jwt_required
@@ -237,6 +256,22 @@ def add_custom_topic():
 
     db.session.add(topic)
     db.session.commit()
+
+    return Responses.ok()
+
+
+@feeds.route('/topics/delete/<int:custom_topic_id>', methods=['DELETE'])
+@cross_origin()
+@jwt_required
+def delete_custom_topic(custom_topic_id):
+    try:
+        CustomTopic.query.filter_by(
+            id=custom_topic_id,
+            user_id=get_jwt_identity()
+        ).delete()
+        db.session.commit()
+    except IntegrityError:
+        pass
 
     return Responses.ok()
 
