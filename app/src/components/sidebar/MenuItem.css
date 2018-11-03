@@ -25,3 +25,11 @@ button.edit-button svg {
 button.edit-button:hover svg {
     fill: white;
 }
+
+.dropdown-item {
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background: lightgray;
+}

@@ -15,6 +15,35 @@ import './MenuItem.css';
 
 
 class MenuItem extends React.Component {
+
+    dropdownItems = () => ({
+        'topic': [
+            {
+                label: 'Add feeds',
+                onClick: () => null
+            },
+            {
+                label: 'Delete',
+                onClick: () => null
+            }
+        ],
+        'feed': [
+            {
+                label: 'Add to topics',
+                onClick: this.props.addToTopics
+            },
+            {
+                label: 'Unfollow',
+                onClick: () => null
+            }
+        ],
+    }[this.props.type]);
+
+    renderDropdownItems = () =>
+        this.dropdownItems().map(({ label, ...props }) => (
+            <DropdownItem key={label} {...props}>{ label }</DropdownItem>
+        ));
+
     render() {
         return (
             <li key={this.props.id}>
@@ -36,14 +65,7 @@ class MenuItem extends React.Component {
                             </button>
                         </DropdownTrigger>
                         <DropdownMenu>
-                            <DropdownContent>
-                                <DropdownItem
-                                    onClick={this.props.addToTopic}
-                                >
-                                    Add to topic
-                                </DropdownItem>
-                                <DropdownItem>Delete</DropdownItem>
-                            </DropdownContent>
+                            <DropdownContent>{ this.renderDropdownItems() }</DropdownContent>
                         </DropdownMenu>
                     </Dropdown>
                 </div>

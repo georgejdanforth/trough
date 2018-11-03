@@ -10,7 +10,7 @@ import {
 import {
     ADD_FEED,
     ADD_TOPIC,
-    ADD_TO_TOPIC,
+    ADD_TO_TOPICS,
     close
 } from '../../actions/modal';
 import AddFeedForm from './AddFeedForm';
@@ -31,7 +31,7 @@ const ModalWrapper = (props) => (
                             close={props.close}
                             {...props.modal.formProps}
                         />;
-                    case ADD_TO_TOPIC:
+                    case ADD_TO_TOPICS:
                         return <AddToTopicForm
                             close={props.close}
                             {...props.modal.formProps}
