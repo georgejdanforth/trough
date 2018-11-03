@@ -19,7 +19,7 @@ class MenuItem extends React.Component {
     dropdownItems = () => ({
         'topic': [
             {
-                label: 'Add feeds',
+                label: 'Manage feeds',
                 onClick: () => null
             },
             {

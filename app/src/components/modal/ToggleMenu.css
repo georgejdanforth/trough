@@ -1,0 +1,39 @@
+.items {
+    max-width: 80%;
+    max-height: 12em;
+    overflow: scroll;
+    margin: auto;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+}
+
+.submit-control {
+    max-width: 80%;
+    margin: auto;
+}
+
+button.submit-button {
+    width: 100%;
+    border: 1px solid lightgray;
+}
+
+button.item-button {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 0;
+}
+
+button.item-button + button.item-button {
+    border-top: 1px solid lightgray;
+}
+
+button.item-selected {
+    background: darkgray;
+}
+
+button.item-button:hover:not(.item-selected) {
+    background: lightgray;
+}
