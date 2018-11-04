@@ -10,6 +10,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required
 )
+from http import HTTPStatus
 from operator import methodcaller
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
@@ -276,53 +277,101 @@ def delete_custom_topic(custom_topic_id):
     return Responses.ok()
 
 
-@feeds.route('/topics/manage', methods=['POST'])
+@feeds.route('/<int:feed_id>/managetopics', methods=['POST'])
 @cross_origin()
 @jwt_required
 @receives_json
-def manage_custom_topics():
+def manage_feed_topics(feed_id):
+    try:
+        Feed.for_user(get_jwt_identity()).filter(Feed.id == feed_id).one()
+    except NoResultFound:
+        return Responses.error('No such feed for user.', HTTPStatus.NOT_FOUND.value)
 
-    user_id = get_jwt_identity()
+    to_add, to_remove = [], []
+    for topic_id, included in request.json_data.get('topic_ids', {}).items():
+        if included:
+            to_add.append(int(topic_id))
+        else:
+            to_remove.append(int(topic_id))
 
-    custom_topic_ids = flatten(
-        CustomTopic.for_user(user_id)
-        .filter(CustomTopic.id.in_(request.json_data.get('topic_ids', [])))
-        .with_entities(CustomTopic.id)
-        .all()
+    existing = flatten(
+        db.session.query(custom_topic_feed.c.custom_topic_id).filter(
+            custom_topic_feed.c.feed_id == feed_id
+        ).all()
     )
 
-    feed_ids = flatten(
-        Feed.for_user(user_id)
-        .filter(Feed.id.in_(request.json_data.get('feed_ids', [])))
-        .with_entities(Feed.id)
-        .all()
-    )
+    to_add = list(set(to_add) - set(existing))
+    to_remove = list(set(to_remove) & set(existing))
 
-    existing = db.session.query(custom_topic_feed).filter(
-        custom_topic_feed.c.custom_topic_id.in_(custom_topic_ids),
-        custom_topic_feed.c.feed_id.in_(feed_ids),
-    ).all()
+    try:
+        if to_add:
+            db.session.execute(
+                custom_topic_feed.insert().values(
+                    list(itertools.product(to_add, [feed_id]))
+                )
+            )
 
-    to_add = list(set(itertools.product(custom_topic_ids, feed_ids)) - set(existing))
-
-    if existing:
-        try:
-            custom_topic_ids, feed_ids = zip(*existing)
+        if to_remove:
             db.session.execute(
                 custom_topic_feed
                 .delete()
-                .where(custom_topic_feed.c.custom_topic_id.in_(custom_topic_ids))
-                .where(custom_topic_feed.c.feed_id.in_(feed_ids))
+                .where(custom_topic_feed.c.custom_topic_id.in_(to_remove))
+                .where(custom_topic_feed.c.feed_id == feed_id)
             )
-            db.session.commit()
-        except IntegrityError:
-            pass
 
-    if to_add:
-        try:
-            db.session.execute(custom_topic_feed.insert().values(to_add))
-            db.session.commit()
-        except IntegrityError:
-            pass
+        db.session.commit()
+
+    except IntegrityError:
+        pass
+
+    return Responses.ok()
+
+
+@feeds.route('/topics/<int:topic_id>/managefeeds', methods=['POST'])
+@cross_origin()
+@jwt_required
+@receives_json
+def manage_topic_feeds(topic_id):
+    try:
+        CustomTopic.for_user(get_jwt_identity()).filter(CustomTopic.id == topic_id).one()
+    except NoResultFound:
+        return Responses.error('No such topic for user.', HTTPStatus.NOT_FOUND.value)
+
+    to_add, to_remove = [], []
+    for feed_id, included in request.json_data.get('feed_ids', {}).items():
+        if included:
+            to_add.append(int(feed_id))
+        else:
+            to_remove.append(int(feed_id))
+
+    existing = flatten(
+        db.session.query(custom_topic_feed.c.feed_id).filter(
+            custom_topic_feed.c.custom_topic_id == topic_id
+        ).all()
+    )
+
+    to_add = list(set(to_add) - set(existing))
+    to_remove = list(set(to_remove) & set(existing))
+
+    try:
+        if to_add:
+            db.session.execute(
+                custom_topic_feed.insert().values(
+                    list(itertools.product([topic_id], to_add))
+                )
+            )
+
+        if to_remove:
+            db.session.execute(
+                custom_topic_feed
+                .delete()
+                .where(custom_topic_feed.c.custom_topic_id == topic_id)
+                .where(custom_topic_feed.c.feed_id.in_(to_remove))
+            )
+
+        db.session.commit()
+
+    except IntegrityError:
+        pass
 
     return Responses.ok()
