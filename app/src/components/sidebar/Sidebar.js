@@ -21,6 +21,7 @@ import {
     manageFeedTopics,
     manageTopicFeeds
 } from '../../actions/modal';
+import { finishUpdateSidebar } from '../../actions/updates';
 
 
 class Sidebar extends React.Component {
@@ -29,36 +30,62 @@ class Sidebar extends React.Component {
         topics: []
     };
 
-    componentDidMount() {
-        getTopics().then(({data}) => this.setState({ topics: data }));
-        getFeeds().then(({data}) => this.setState({ feeds: data }));
+    static getDerivedStateFromProps(props, state) {
+        if (props.updates.updateSidebar) {
+            return {
+                feeds: null,
+                topics: null
+            };
+        }
+
+        return null;
     }
 
+    componentDidMount() {
+        this.updateTopicsAndFeeds();
+    }
+
+    componentDidUpdate() {
+        if (this.props.updates.updateSidebar) {
+            this.updateTopicsAndFeeds();
+        }
+    }
+
+    updateTopicsAndFeeds = () => {
+        this.props.finishUpdateSidebar();
+        getTopics().then(({data}) => this.setState({ topics: data }));
+        getFeeds().then(({data}) => this.setState({ feeds: data }));
+    };
+
     renderFeeds = () =>
-        this.state.feeds.map(feed => (
-            <MenuItem
-                key={feed.id}
-                type={'feed'}
-                manageFeedTopics={() => this.props.manageFeedTopics(feed)}
-                deleteItem={() => this.props.deleteItem('feed', feed)}
-                isActive={this.props.filters.feedId === feed.id}
-                filterFn={this.props.setFeedFilter}
-                {...feed}
-            />
-        ));
+        this.state.feeds === null
+            ? []
+            : this.state.feeds.map(feed => (
+                <MenuItem
+                    key={feed.id}
+                    type={'feed'}
+                    manageFeedTopics={() => this.props.manageFeedTopics(feed)}
+                    deleteItem={() => this.props.deleteItem('feed', feed)}
+                    isActive={this.props.filters.feedId === feed.id}
+                    filterFn={this.props.setFeedFilter}
+                    {...feed}
+                />
+            ));
 
     renderTopics = () =>
-        this.state.topics.map(topic => (
-            <MenuItem
-                key={topic.id}
-                type={'topic'}
-                manageTopicFeeds={() => this.props.manageTopicFeeds(topic)}
-                deleteItem={() => this.props.deleteItem('topic', topic)}
-                isActive={this.props.filters.topicId === topic.id}
-                filterFn={this.props.setTopicFilter}
-                {...topic}
-            />
-        ));
+        this.state.topics === null
+            ? []
+            : this.state.topics.map(topic => (
+                <MenuItem
+                    key={topic.id}
+                    type={'topic'}
+                    manageTopicFeeds={() => this.props.manageTopicFeeds(topic)}
+                    deleteItem={() => this.props.deleteItem('topic', topic)}
+                    isActive={this.props.filters.topicId === topic.id}
+                    filterFn={this.props.setTopicFilter}
+                    {...topic}
+                />
+            ));
 
     render() {
         return (
@@ -107,7 +134,7 @@ class Sidebar extends React.Component {
 }
 
 
-const mapStateToProps = state => ({ filters: state.filters });
+const mapStateToProps = state => ({ filters: state.filters, updates: state.updates });
 
 
 export default connect(
@@ -121,6 +148,7 @@ export default connect(
         setFeedFilter,
         setSavedFilter,
         setTopicFilter,
-        clearFilters
+        clearFilters,
+        finishUpdateSidebar
     }
 )(Sidebar);

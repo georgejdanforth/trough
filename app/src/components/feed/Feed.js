@@ -5,6 +5,7 @@ import { Container } from 'bloomer';
 import './Feed.css';
 
 import FeedItem from './FeedItem';
+import { updateFeed, finishUpdateFeed } from '../../actions/updates';
 import { getFeedItems } from '../../utils/http';
 
 
@@ -13,6 +14,13 @@ class Feed extends React.Component {
     state = { feedItems: null };
 
     static getDerivedStateFromProps(props, state) {
+        if (props.updates.updateFeed) {
+            return {
+                feedItems: null,
+                previousFilters: state.previousFilters
+            };
+        }
+
         if (props.filters !== state.previousFilters) {
             return {
                 feedItems: null,
@@ -42,6 +50,7 @@ class Feed extends React.Component {
     _updateFeedItems(filters) {
         this._asyncRequest = getFeedItems(filters)
             .then(({ data }) => {
+                this.props.finishUpdateFeed();
                 this._asyncRequest = null;
                 this.setState({ feedItems: data });
             });
@@ -62,7 +71,13 @@ class Feed extends React.Component {
 }
 
 
-const mapStateToProps = state => ({ filters: state.filters });
+const mapStateToProps = state => ({ filters: state.filters, updates: state.updates });
 
 
-export default connect(mapStateToProps)(Feed);
+export default connect(
+    mapStateToProps,
+    {
+        updateFeed,
+        finishUpdateFeed
+    }
+)(Feed);

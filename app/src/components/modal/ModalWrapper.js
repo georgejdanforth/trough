@@ -23,40 +23,34 @@ import ManageFeedTopicsForm from './ManageFeedTopicsForm';
 import ManageTopicFeedsForm from './ManageTopicFeedsForm';
 
 
-const ModalWrapper = (props) => (
-    <Modal isActive={props.modal.isActive}>
-        <ModalBackground onClick={props.close}/>
-        <ModalContent>
-            {(() => {
-                switch (props.modal.type) {
-                    case ADD_FEED:
-                        return <AddFeedForm close={props.close}/>;
-                    case ADD_TOPIC:
-                        return <AddTopicForm
-                            close={props.close}
-                            {...props.modal.formProps}
-                        />;
-                    case DELETE_ITEM:
-                        return <DeleteItemForm
-                            close={props.close}
-                            {...props.modal.formProps}
-                        />
-                    case MANAGE_FEED_TOPICS:
-                        return <ManageFeedTopicsForm
-                            close={props.close}
-                            {...props.modal.formProps}
-                        />;
-                    case MANAGE_TOPIC_FEEDS:
-                        return <ManageTopicFeedsForm
-                            close={props.close}
-                            {...props.modal.formProps}
-                        />;
-                }
-            })()}
-        </ModalContent>
-        <ModalClose onClick={props.close}/>
-    </Modal>
-);
+const ModalWrapper = (props) => {
+
+    const close = () => props.close(props.modal.type);
+    const formProps = { close, ...props.modal.formProps };
+
+    return (
+        <Modal isActive={props.modal.isActive}>
+            <ModalBackground onClick={close}/>
+            <ModalContent>
+                {(() => {
+                    switch (props.modal.type) {
+                        case ADD_FEED:
+                            return <AddFeedForm {...formProps}/>;
+                        case ADD_TOPIC:
+                            return <AddTopicForm {...formProps}/>;
+                        case DELETE_ITEM:
+                            return <DeleteItemForm {...formProps}/>;
+                        case MANAGE_FEED_TOPICS:
+                            return <ManageFeedTopicsForm {...formProps}/>;
+                        case MANAGE_TOPIC_FEEDS:
+                            return <ManageTopicFeedsForm {...formProps}/>;
+                    }
+                })()}
+            </ModalContent>
+            <ModalClose onClick={close}/>
+        </Modal>
+    );
+};
 
 
 const mapStateToProps = state => ({ modal: state.modal });

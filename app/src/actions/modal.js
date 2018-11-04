@@ -1,3 +1,5 @@
+import { updateFeed, updateSidebar } from './updates';
+
 export const ADD_FEED = 'ADD_FEED';
 export const ADD_TOPIC = 'ADD_TOPIC';
 export const DELETE_ITEM = 'DELETE_ITEM';
@@ -30,7 +32,30 @@ export const deleteItem = (itemType, item) => ({
     formProps: { itemType, item  }
 });
 
-export const close = () => ({
-    type: CLOSE,
-    formProps: {}
-});
+export const close = formType => dispatch => {
+    dispatch({
+        type: CLOSE,
+        formProps: {}
+    });
+
+    const update = (() => {
+        switch (formType) {
+            case ADD_FEED:
+                return updateSidebar;
+            case ADD_TOPIC:
+                return updateSidebar;
+            case DELETE_ITEM:
+                return updateSidebar;
+            case MANAGE_FEED_TOPICS:
+                return updateFeed;
+            case MANAGE_TOPIC_FEEDS:
+                return updateFeed;
+            default:
+                return null;
+        }
+    })();
+
+    if (update) {
+        dispatch(update());
+    }
+};
