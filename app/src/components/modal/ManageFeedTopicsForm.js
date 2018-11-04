@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Field, Label } from 'bloomer';
 
 import ToggleMenu from './ToggleMenu';
-import { manageTopics, getTopics } from '../../utils/http';
+import { manageFeedTopics, getTopics } from '../../utils/http';
 
 
 export default class ManageFeedTopicsForm extends React.Component {
@@ -14,7 +14,7 @@ export default class ManageFeedTopicsForm extends React.Component {
         getTopics(this.props.feed.id).then(({data}) => this.setState({ topics: data }));
     }
 
-    submit = ids => manageTopics(ids, [this.props.feed.id]).then(() => this.props.close());
+    submit = ids => manageFeedTopics(this.props.feed.id, ids).then(() => this.props.close());
 
     render() {
         return (

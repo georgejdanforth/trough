@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Control, Field } from 'bloomer';
 import classNames from 'classnames/bind';
+import _ from 'lodash';
 
 import './ToggleMenu.css';
 
@@ -9,25 +10,18 @@ export default class ToggleMenu extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            addedItemIds: props.items.filter(item => item.added).map(item => item.id)
+            inclusions: props.items.reduce((obj, item) => (obj[item.id] = item.added, obj), {})
         };
     }
-    state = {
-        addedItemIds: []
-    };
-
-    _with = (array, item) => [...array, item];
-
-    _without = (array, item) => array.filter(member => member !== item);
 
     toggleItem = item => this.setState({
-        addedItemIds: this.state.addedItemIds.includes(item.id)
-            ? this._without(this.state.addedItemIds, item.id)
-            : this._with(this.state.addedItemIds, item.id)
+        inclusions: {
+            [item.id]: !this.state.inclusions[item.id],
+            ..._.omit(this.state.inclusions, item.id)}
     });
 
     itemClassName = item =>
-        classNames('item-button', {'item-selected': this.state.addedItemIds.includes(item.id)});
+        classNames('item-button', {'item-selected': this.state.inclusions[item.id]});
 
     renderItems = () =>
         this.props.items.map(item => (
@@ -52,8 +46,7 @@ export default class ToggleMenu extends React.Component {
                     <Control className={'submit-control'}>
                         <Button
                             className={'submit-button'}
-                            disabled={!this.state.addedItemIds.length}
-                            onClick={() => this.props.submit(this.state.addedItemIds)}
+                            onClick={() => this.props.submit(this.state.inclusions)}
                         >
                             { this.props.submitText }
                         </Button>
