@@ -86,7 +86,13 @@ class CustomTopic(BaseModel, Serializable):
     name = db.Column(TEXT, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    feeds = db.relationship('Feed', secondary=custom_topic_feed)
+    feeds = db.relationship(
+        'Feed',
+        secondary=custom_topic_feed,
+        cascade='all, delete-orphan',
+        passive_deletes=True,
+        single_parent=True
+    )
 
     @classmethod
     def for_user(cls, user):
