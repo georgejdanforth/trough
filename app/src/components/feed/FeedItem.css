@@ -1,10 +1,14 @@
-.content.feed-item {
-    border-left: 1px solid transparent;
+.content {
+    display: flex;
+}
+
+.feed-item {
+    border-left: 2px solid transparent;
     padding-left: 0.5rem;
 }
 
-.feed-item:hover {
-    border-left: 1px solid dimgray;
+.content:hover .feed-item {
+    border-left: 2px solid lightgray;
 }
 
 .feed-name-and-date {
@@ -23,15 +27,20 @@
     text-decoration: underline;
 }
 
-.save {
-    padding-left: 0.4rem;
+.item-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    margin-right: 0.5rem;
+
+    visibility: hidden;
 }
 
-.save:hover {
+.content:hover .item-actions {
+    visibility: visible;
+}
+
+.action:hover {
     cursor: pointer;
-}
-
-.save svg {
-    position: relative;
-    top: 0.2rem;
 }

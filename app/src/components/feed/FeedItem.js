@@ -1,6 +1,6 @@
 import React from 'react';
 import { Content } from 'bloomer';
-import { mdiBookmark, mdiBookmarkOutline } from '@mdi/js';
+import { mdiBookmark, mdiBookmarkOutline, mdiRss } from '@mdi/js';
 import { Icon } from '@mdi/react';
 import moment from 'moment';
 
@@ -31,20 +31,12 @@ export default class FeedItem extends React.Component {
 
     render() {
         return (
-            <Content className={'feed-item'}>
-                <span className={'feed-name-and-date'}>
-                    { this.props.feedInfo.title } | { moment(this.props.pubdate).fromNow() }
-                </span>
-                <div>
-                    <span className={'item-title'}>
-                        <a
-                            href={this.props.url}
-                            target={'_blank'}
-                        >
-                            { this.props.title }
-                        </a>
-                    </span>
-                    <span className={'save'}>
+            <Content>
+                <div className={'item-actions'}>
+                    <span
+                        className={'action tooltip'}
+                        data-tooltip={this.state.isSaved ? 'Unsave': 'Save'}
+                    >
                         <Icon
                             onClick={this.state.isSaved ? this.unsave : this.save}
                             path={this.state.isSaved ? mdiBookmark : mdiBookmarkOutline}
@@ -53,7 +45,22 @@ export default class FeedItem extends React.Component {
                         />
                     </span>
                 </div>
-                <p>{ this.trimWords(this.props.description) }</p>
+                <div className={'feed-item'}>
+                    <span className={'feed-name-and-date'}>
+                        { this.props.feedInfo.title } | { moment(this.props.pubdate).fromNow() }
+                    </span>
+                    <div>
+                        <span className={'item-title'}>
+                            <a
+                                href={this.props.url}
+                                target={'_blank'}
+                            >
+                                { this.props.title }
+                            </a>
+                        </span>
+                    </div>
+                    <p>{ this.trimWords(this.props.description) }</p>
+                </div>
             </Content>
         );
     }
