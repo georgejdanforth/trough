@@ -16,8 +16,18 @@ from api.userdata.models import (
 
 custom_topic_feed = db.Table(
     'custom_topic_feed',
-    db.Column('custom_topic_id', db.Integer, db.ForeignKey('customtopic.id'), primary_key=True),
-    db.Column('feed_id', db.Integer, db.ForeignKey('feed.id'), primary_key=True),
+    db.Column(
+        'custom_topic_id',
+        db.Integer,
+        db.ForeignKey('customtopic.id', ondelete='CASCADE'),
+        primary_key=True
+    ),
+    db.Column(
+        'feed_id',
+        db.Integer,
+        db.ForeignKey('feed.id', ondelete='CASCADE'),
+        primary_key=True
+    ),
     db.UniqueConstraint('custom_topic_id', 'feed_id')
 )
 
@@ -86,13 +96,7 @@ class CustomTopic(BaseModel, Serializable):
     name = db.Column(TEXT, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    feeds = db.relationship(
-        'Feed',
-        secondary=custom_topic_feed,
-        cascade='all, delete-orphan',
-        passive_deletes=True,
-        single_parent=True
-    )
+    feeds = db.relationship('Feed', secondary=custom_topic_feed)
 
     @classmethod
     def for_user(cls, user):
