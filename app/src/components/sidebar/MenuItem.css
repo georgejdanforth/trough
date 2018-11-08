@@ -11,11 +11,6 @@
     outline: none;
     background: none;
     cursor: pointer;
-    visibility: hidden;
-}
-
-.menu-item:hover button.edit-button {
-    visibility: visible;
 }
 
 button.edit-button svg {

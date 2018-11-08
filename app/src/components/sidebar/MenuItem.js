@@ -54,20 +54,26 @@ class MenuItem extends React.Component {
                     >
                         { this.props.title || this.props.name }
                     </MenuLink>
-                    <Dropdown isAlign={'right'} isHoverable={true}>
-                        <DropdownTrigger>
-                            <button
-                                className={'edit-button'}
-                                aria-haspopup={'true'}
-                                aria-controls={'dropdown-menu'}
-                            >
-                                <Icon path={mdiPencil} size={0.65}/>
-                            </button>
-                        </DropdownTrigger>
-                        <DropdownMenu>
-                            <DropdownContent>{ this.renderDropdownItems() }</DropdownContent>
-                        </DropdownMenu>
-                    </Dropdown>
+                    {
+                        this.props.isActive &&
+                        <Dropdown isAlign={'right'} isHoverable={true}>
+                            <DropdownTrigger>
+                                <button
+                                    className={'edit-button'}
+                                    aria-haspopup={'true'}
+                                    aria-controls={'dropdown-menu'}
+                                >
+                                    <Icon path={mdiPencil} size={0.65}/>
+                                </button>
+                            </DropdownTrigger>
+                            <DropdownMenu>
+                                <DropdownContent>
+                                    { this.renderDropdownItems() }
+                                </DropdownContent>
+                            </DropdownMenu>
+                        </Dropdown>
+
+                    }
                 </div>
             </li>
         );
