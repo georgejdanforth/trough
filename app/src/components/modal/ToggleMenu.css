@@ -26,12 +26,12 @@ button.item-button {
     border-radius: 0;
 }
 
-button.item-button + button.item-button {
-    border-top: 1px solid lightgray;
+.item-icon {
+    margin-left: 0.75em;
 }
 
-button.item-selected {
-    background: darkgray;
+div.item-control + div.item-control {
+    border-top: 1px solid lightgray;
 }
 
 button.item-button:hover:not(.item-selected) {

@@ -1,7 +1,11 @@
 import React from 'react';
-import { Button, Control, Field } from 'bloomer';
-import classNames from 'classnames/bind';
+import { Button, Control, Field, Icon as FormIcon } from 'bloomer';
 import _ from 'lodash';
+import { Icon } from '@mdi/react';
+import {
+    mdiCheckboxBlankCircleOutline,
+    mdiCheckboxMarkedCircleOutline
+} from '@mdi/js';
 
 import './ToggleMenu.css';
 
@@ -20,18 +24,32 @@ export default class ToggleMenu extends React.Component {
             ..._.omit(this.state.inclusions, item.id)}
     });
 
-    itemClassName = item =>
-        classNames('item-button', {'item-selected': this.state.inclusions[item.id]});
-
     renderItems = () =>
         this.props.items.map(item => (
-            <Button
-                key={item.id}
-                className={this.itemClassName(item)}
-                onClick={() => this.toggleItem(item)}
-            >
-                { item.title || item.name }
-            </Button>
+            <Control className={'item-control'} hasIcons={'left'}>
+                <Button
+                    key={item.id}
+                    className={'item-button'}
+                    onClick={() => this.toggleItem(item)}
+                >
+                    <FormIcon
+                        isAlign={'left'}
+                        isSize={'small'}
+                    >
+                        <Icon
+                            className={'item-icon'}
+                            size={0.8}
+                            color={'gray'}
+                            path={
+                                this.state.inclusions[item.id]
+                                    ? mdiCheckboxMarkedCircleOutline
+                                    : mdiCheckboxBlankCircleOutline
+                            }
+                        />
+                    </FormIcon>
+                    <span>{ item.title || item.name }</span>
+                </Button>
+            </Control>
         ));
 
     render() {
