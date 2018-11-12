@@ -8,7 +8,8 @@ from api.models import BaseModel
 user_feed = db.Table(
     'user_feed',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('feed_id', db.Integer, db.ForeignKey('feed.id'), primary_key=True)
+    db.Column('feed_id', db.Integer, db.ForeignKey('feed.id'), primary_key=True),
+    db.UniqueConstraint('user_id', 'feed_id')
 )
 
 

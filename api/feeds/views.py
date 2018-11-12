@@ -21,7 +21,8 @@ from api.feeds.models import (
     custom_topic_feed,
     CustomTopic,
     Feed,
-    FeedItem
+    FeedItem,
+    SavedFeedItem
 )
 from api.feeds.utils import (
     FeedParser,
@@ -79,6 +80,7 @@ def get_feeds():
 @receives_query_params
 def get_feed_items(page):
     user = User.query.filter_by(id=get_jwt_identity()).one()
+    order_by = FeedItem.pubdate.desc()
 
     if 'saved' in request.query_params:
         return Responses.json_response((
@@ -101,7 +103,7 @@ def get_feed_items(page):
         feed_item.to_dict(user=user)
         for feed_item in (
             feed_items
-            .order_by(FeedItem.pubdate.desc())
+            .order_by(order_by)
             .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
             .items
         )
@@ -189,7 +191,13 @@ def unfollow_feed(feed_id):
 @cross_origin()
 @jwt_required
 def save_feed_item(feed_item_id):
+    saved_feed_item = SavedFeedItem(
+        user_id=get_jwt_identity(),
+        feed_item_id=feed_item_id
+    )
+
     try:
+        db.session.add(saved_feed_item)
         db.session.execute(
             user_saved_feed_item.insert().values(
                 user_id=get_jwt_identity(),
@@ -208,10 +216,18 @@ def save_feed_item(feed_item_id):
 @cross_origin()
 @jwt_required
 def remove_saved_feed_item(feed_item_id):
+
+    user_id = get_jwt_identity()
+
+    SavedFeedItem.query.filter(
+        SavedFeedItem.feed_item_id == feed_item_id,
+        SavedFeedItem.user_id == user_id
+    ).delete()
+
     db.session.execute(
         user_saved_feed_item
         .delete()
-        .where(user_saved_feed_item.c.user_id == get_jwt_identity())
+        .where(user_saved_feed_item.c.user_id == user_id)
         .where(user_saved_feed_item.c.feed_item_id == feed_item_id)
     )
 
