@@ -2,6 +2,7 @@ from sqlalchemy.dialects.postgresql import (
     JSON,
     TEXT
 )
+from sqlalchemy.orm.exc import NoResultFound
 
 from api.extensions import db
 from api.models import (
@@ -84,6 +85,27 @@ class FeedItem(BaseModel, Serializable):
 
     def is_saved(self, user):
         return self in user.saved_feed_items
+
+    @classmethod
+    def for_user(cls, user_id):
+        return (
+            cls.query
+            .join(Feed, Feed.id == cls.feed_id)
+            .join(user_feed, user_feed.c.feed_id == Feed.id)
+            .filter(user_feed.c.user_id == user_id)
+        )
+
+    @classmethod
+    def for_feed(cls, user_id, feed_id):
+        return cls.for_user(user_id).filter(Feed.id == feed_id)
+
+    @classmethod
+    def for_topic(cls, user_id, topic_id):
+        return (
+            cls.for_user(user_id)
+            .join(custom_topic_feed, custom_topic_feed.c.feed_id == Feed.id)
+            .filter(custom_topic_feed.c.custom_topic_id == topic_id)
+        )
 
 
 class CustomTopic(BaseModel, Serializable):

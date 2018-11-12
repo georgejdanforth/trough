@@ -90,37 +90,22 @@ def get_feed_items(page):
             )
         ))
 
+    elif 'feed_id' in request.query_params:
+        feed_items = FeedItem.for_feed(user.id, request.query_params['feed_id'])
     elif 'topic_id' in request.query_params:
-        topic_id = request.query_params['topic_id']
-        return Responses.json_response((
-            feed_item.to_dict(user=user)
-            for feed_item in (
-                FeedItem
-                .query
-                .join(Feed, Feed.id == FeedItem.feed_id)
-                .join(custom_topic_feed, Feed.id == custom_topic_feed.c.feed_id)
-                .filter(custom_topic_feed.c.custom_topic_id == topic_id)
-                .order_by(FeedItem.pubdate.desc())
-                .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
-                .items
-            )
-        ))
-
+        feed_items = FeedItem.for_topic(user.id, request.query_params['topic_id'])
     else:
-        return Responses.json_response((
-            feed_item.to_dict(user=user)
-            for feed_item in (
-                FeedItem
-                .query
-                .join(Feed, Feed.id == FeedItem.feed_id)
-                .join(user_feed, Feed.id == user_feed.c.feed_id)
-                .filter(user_feed.c.user_id == user.id)
-                .filter_by(**request.query_params)
-                .order_by(FeedItem.pubdate.desc())
-                .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
-                .items
-            )
-        ))
+        feed_items = FeedItem.for_user(user.id)
+
+    return Responses.json_response((
+        feed_item.to_dict(user=user)
+        for feed_item in (
+            feed_items
+            .order_by(FeedItem.pubdate.desc())
+            .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
+            .items
+        )
+    ))
 
 
 @feeds.route('/isvalid', methods=['GET'])
