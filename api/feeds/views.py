@@ -165,12 +165,32 @@ def add_feed():
 @cross_origin()
 @jwt_required
 def unfollow_feed(feed_id):
+    user_id = get_jwt_identity()
     try:
         db.session.execute(
             user_feed
             .delete()
-            .where(user_feed.c.user_id == get_jwt_identity())
+            .where(user_feed.c.user_id == user_id)
             .where(user_feed.c.feed_id == feed_id)
+        )
+
+        db.session.execute(
+            custom_topic_feed
+            .delete()
+            .where(custom_topic_feed.c.feed_id == feed_id)
+            .where(
+                custom_topic_feed.c.custom_topic_id.in_(
+                    db.session.query(CustomTopic.id)
+                    .filter(CustomTopic.user_id == user_id)
+                    .join(
+                        custom_topic_feed,
+                        custom_topic_feed.c.custom_topic_id == CustomTopic.id
+                    )
+                    .join(Feed, Feed.id == custom_topic_feed.c.feed_id)
+                    .filter(Feed.id == feed_id)
+                    .subquery()
+                )
+            )
         )
 
         db.session.commit()
