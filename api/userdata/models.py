@@ -13,14 +13,6 @@ user_feed = db.Table(
 )
 
 
-user_saved_feed_item = db.Table(
-    'user_saved_feed_item',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('feed_item_id', db.Integer, db.ForeignKey('feeditem.id'), primary_key=True),
-    db.UniqueConstraint('user_id', 'feed_item_id')
-)
-
-
 class User(BaseModel):
 
     email = db.Column(db.String(255), unique=True, nullable=False)
@@ -39,8 +31,6 @@ class User(BaseModel):
         lazy='dynamic',
         backref=db.backref('users', lazy='dynamic')
     )
-
-    saved_feed_items = db.relationship('FeedItem', secondary=user_saved_feed_item)
 
     custom_topics = db.relationship('CustomTopic', lazy=True)
 

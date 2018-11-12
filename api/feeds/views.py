@@ -30,8 +30,7 @@ from api.feeds.utils import (
 )
 from api.userdata.models import (
     User,
-    user_feed,
-    user_saved_feed_item
+    user_feed
 )
 from api.utils import (
     Responses,
@@ -83,15 +82,8 @@ def get_feed_items(page):
     order_by = FeedItem.pubdate.desc()
 
     if 'saved' in request.query_params:
-        return Responses.json_response((
-            feed_item.to_dict(user=user)
-            for feed_item in sorted(
-                user.saved_feed_items,
-                key=lambda fi: fi.pubdate,
-                reverse=True
-            )
-        ))
-
+        feed_items = FeedItem.for_saved(user.id)
+        order_by = SavedFeedItem.id.desc()
     elif 'feed_id' in request.query_params:
         feed_items = FeedItem.for_feed(user.id, request.query_params['feed_id'])
     elif 'topic_id' in request.query_params:
@@ -100,8 +92,8 @@ def get_feed_items(page):
         feed_items = FeedItem.for_user(user.id)
 
     return Responses.json_response((
-        feed_item.to_dict(user=user)
-        for feed_item in (
+        {'is_saved': bool(feed_item_id), **feed_item.to_dict(user=user)}
+        for feed_item, feed_item_id in (
             feed_items
             .order_by(order_by)
             .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
@@ -198,13 +190,6 @@ def save_feed_item(feed_item_id):
 
     try:
         db.session.add(saved_feed_item)
-        db.session.execute(
-            user_saved_feed_item.insert().values(
-                user_id=get_jwt_identity(),
-                feed_item_id=feed_item_id
-            )
-        )
-
         db.session.commit()
     except IntegrityError:
         pass
@@ -217,19 +202,10 @@ def save_feed_item(feed_item_id):
 @jwt_required
 def remove_saved_feed_item(feed_item_id):
 
-    user_id = get_jwt_identity()
-
     SavedFeedItem.query.filter(
         SavedFeedItem.feed_item_id == feed_item_id,
-        SavedFeedItem.user_id == user_id
+        SavedFeedItem.user_id == get_jwt_identity()
     ).delete()
-
-    db.session.execute(
-        user_saved_feed_item
-        .delete()
-        .where(user_saved_feed_item.c.user_id == user_id)
-        .where(user_saved_feed_item.c.feed_item_id == feed_item_id)
-    )
 
     db.session.commit()
 

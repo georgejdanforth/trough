@@ -63,8 +63,7 @@ class FeedItem(BaseModel, Serializable):
         'description',
         'content',
         'enclosure',
-        'feed_info',
-        'is_saved'
+        'feed_info'
     ]
 
     title = db.Column(TEXT, nullable=False)
@@ -83,13 +82,11 @@ class FeedItem(BaseModel, Serializable):
     def feed_info(self):
         return self.feed.to_dict()
 
-    def is_saved(self, user):
-        return self in user.saved_feed_items
-
     @classmethod
     def for_user(cls, user_id):
         return (
-            cls.query
+            db.session.query(cls, SavedFeedItem.feed_item_id)
+            .outerjoin(SavedFeedItem, SavedFeedItem.feed_item_id == cls.id)
             .join(Feed, Feed.id == cls.feed_id)
             .join(user_feed, user_feed.c.feed_id == Feed.id)
             .filter(user_feed.c.user_id == user_id)
@@ -98,6 +95,10 @@ class FeedItem(BaseModel, Serializable):
     @classmethod
     def for_feed(cls, user_id, feed_id):
         return cls.for_user(user_id).filter(Feed.id == feed_id)
+
+    @classmethod
+    def for_saved(cls, user_id):
+        return cls.for_user(user_id).filter(SavedFeedItem.feed_item_id != None)
 
     @classmethod
     def for_topic(cls, user_id, topic_id):
