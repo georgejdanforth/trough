@@ -73,11 +73,11 @@ def get_feeds():
     )
 
 
-@feeds.route('/feeditems/<int:page>', methods=['GET'])
+@feeds.route('/feeditems', methods=['GET'])
 @cross_origin()
 @jwt_required
 @receives_query_params
-def get_feed_items(page):
+def get_feed_items():
     user = User.query.filter_by(id=get_jwt_identity()).one()
     order_by = FeedItem.pubdate.desc()
 
@@ -96,7 +96,10 @@ def get_feed_items(page):
         for feed_item, feed_item_id in (
             feed_items
             .order_by(order_by)
-            .paginate(page=page, per_page=constants.MAX_ITEMS_PER_PAGE)
+            .paginate(
+                page=int(request.query_params.get('page', 1)),
+                per_page=constants.MAX_ITEMS_PER_PAGE
+            )
             .items
         )
     ))

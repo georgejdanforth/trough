@@ -12,6 +12,9 @@ import { updateFeed, finishUpdateFeed } from '../../actions/updates';
 import { getFeedItems } from '../../utils/http';
 
 
+const MAX_FEED_ITEMS = 30;
+
+
 class Feed extends React.Component {
 
     state = { feedItems: null };
@@ -82,6 +85,7 @@ class Feed extends React.Component {
                     </Button>
                     <Button
                         className={'page-button'}
+                        disabled={this.state.feedItems && this.state.feedItems.length < MAX_FEED_ITEMS}
                         onClick={() => this.props.incrementPage(this.props.filters)}
                     >
                         Next page

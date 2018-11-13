@@ -46,7 +46,7 @@ export const getFeeds = refresh(forTopic =>
     axios.get(`${BASE_URL}/feeds/feeds?${forTopic ? `forTopic=${forTopic}` : ''}`, getAccessConfig()));
 
 export const getFeedItems = refresh(filters =>
-    axios.get(`${BASE_URL}/feeds/feeditems/1?${filtersToQueryParams(filters)}`, getAccessConfig()));
+    axios.get(`${BASE_URL}/feeds/feeditems?${filtersToQueryParams(filters)}`, getAccessConfig()));
 
 export const validateFeed = refresh(feedUrl =>
     axios.get(`${BASE_URL}/feeds/isvalid?url=${feedUrl}`, getAccessConfig()));
