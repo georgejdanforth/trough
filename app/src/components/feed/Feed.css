@@ -2,3 +2,13 @@
     padding: 2% 5% 2% 3%;
     width: 100%;
 }
+
+div.page-buttons {
+    text-align: center;
+}
+
+button.page-button {
+    margin-left: .5em;
+    margin-right: .5em;
+    width: 15em;
+}

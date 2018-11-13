@@ -1,10 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Container } from 'bloomer';
+import { Button, Container } from 'bloomer';
+import { Icon } from '@mdi/react';
+import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 
 import './Feed.css';
 
 import FeedItem from './FeedItem';
+import { decrementPage, incrementPage } from '../../actions/filters';
 import { updateFeed, finishUpdateFeed } from '../../actions/updates';
 import { getFeedItems } from '../../utils/http';
 
@@ -50,7 +53,10 @@ class Feed extends React.Component {
     _updateFeedItems(filters) {
         this._asyncRequest = getFeedItems(filters)
             .then(({ data }) => {
-                this.props.finishUpdateFeed();
+                if (this.props.updates.updateFeed) {
+                    this.props.finishUpdateFeed();
+                }
+
                 this._asyncRequest = null;
                 this.setState({ feedItems: data });
             });
@@ -65,6 +71,23 @@ class Feed extends React.Component {
         return (
             <Container className='feed-container'>
                 { this.state.feedItems === null ? 'Loading...' : this.renderFeedItems() }
+                <div className={'page-buttons'}>
+                    <Button
+                        className={'page-button'}
+                        disabled={this.props.filters.page <= 1}
+                        onClick={() => this.props.decrementPage(this.props.filters)}
+                    >
+                        <Icon path={mdiChevronLeft} size={0.8}/>
+                        Previous page
+                    </Button>
+                    <Button
+                        className={'page-button'}
+                        onClick={() => this.props.incrementPage(this.props.filters)}
+                    >
+                        Next page
+                        <Icon path={mdiChevronRight} size={0.8}/>
+                    </Button>
+                </div>
             </Container>
         );
     }
@@ -77,6 +100,8 @@ const mapStateToProps = state => ({ filters: state.filters, updates: state.updat
 export default connect(
     mapStateToProps,
     {
+        decrementPage,
+        incrementPage,
         updateFeed,
         finishUpdateFeed
     }
