@@ -1,10 +1,13 @@
 import asyncio
 import aiohttp
 import dateparser
-import datetime
 import re
 import requests
 
+from datetime import (
+    datetime,
+    timedelta
+)
 from io import StringIO
 from pattern.web import plaintext
 from sqlalchemy.orm.exc import NoResultFound
@@ -14,7 +17,8 @@ from api.extensions import db
 from api.feeds import constants
 from api.feeds.models import (
     Feed,
-    FeedItem
+    FeedItem,
+    SavedFeedItem
 )
 from api.feeds.types import FeedType
 
@@ -162,6 +166,13 @@ class FeedParser:
         return item
 
 
+def cleanup_old_feed_items(days_back):
+    FeedItem.query.filter(
+        FeedItem.created < datetime.utcnow() - timedelta(days=days_back),
+        ~SavedFeedItem.query.filter(SavedFeedItem.feed_item_id == FeedItem.id).exists()
+    ).delete(synchronize_session='fetch')
+
+
 def get_or_create_feed(feed_url):
     feed_response = requests.get(feed_url)
     if not feed_response.ok:
@@ -209,7 +220,7 @@ async def process_feeds():
         ]
 
         results = await asyncio.gather(*tasks)
-        now = datetime.datetime.utcnow()
+        now = datetime.utcnow()
         for feed, result in results:
             feed.last_processed = now
             db.session.add(feed)

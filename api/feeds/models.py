@@ -113,8 +113,18 @@ class SavedFeedItem(BaseModel):
 
     __table_args__ = (db.UniqueConstraint('feed_item_id', 'user_id'),)
 
-    feed_item_id = db.Column(db.Integer, db.ForeignKey('feeditem.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    feed_item_id = db.Column(
+        db.Integer,
+        db.ForeignKey('feeditem.id', ondelete='CASCADE'),
+        nullable=False
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id', ondelete='CASCADE'),
+        nullable=False,
+
+    )
 
 
 class CustomTopic(BaseModel, Serializable):
