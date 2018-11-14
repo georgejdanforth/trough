@@ -8,6 +8,7 @@ from api.feeds.utils import (
     cleanup_old_feed_items,
     process_feeds,
 )
+from api.userdata.utils import cleanup_expired_tokens
 
 
 @click.command('update_feeds')
@@ -23,7 +24,14 @@ def cleanup_feed_items(days_back):
     cleanup_old_feed_items(days_back)
 
 
+@click.command('cleanup_expired_jwts')
+@with_appcontext
+def cleanup_expired_jwts():
+    cleanup_expired_tokens()
+
+
 commands = [
     update_feeds,
     cleanup_feed_items,
+    cleanup_expired_jwts,
 ]

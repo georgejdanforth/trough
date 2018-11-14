@@ -76,7 +76,7 @@ def cleanup_expired_tokens():
     num_items_deleted = (
         JsonWebToken
         .query
-        .filter(JsonWebToken.expires > datetime.datetime.utcnow)
+        .filter(JsonWebToken.expires < datetime.datetime.utcnow())
         .delete()
     )
     db.session.commit()
