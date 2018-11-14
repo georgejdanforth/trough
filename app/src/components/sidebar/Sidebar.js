@@ -7,6 +7,7 @@ import { mdiPlusCircleOutline } from '@mdi/js';
 import './Sidebar.css';
 
 import MenuItem from './MenuItem';
+import Spinner from '../shared/Spinner';
 import { getFeeds, getTopics } from '../../utils/http';
 import {
     clearFilters,
@@ -59,7 +60,7 @@ class Sidebar extends React.Component {
 
     renderFeeds = () =>
         this.state.feeds === null
-            ? []
+            ? <Spinner size={1} color={'lightgray'}/>
             : this.state.feeds.map(feed => (
                 <MenuItem
                     key={feed.id}
@@ -74,7 +75,7 @@ class Sidebar extends React.Component {
 
     renderTopics = () =>
         this.state.topics === null
-            ? []
+            ? <Spinner size={1} color={'lightgray'}/>
             : this.state.topics.map(topic => (
                 <MenuItem
                     key={topic.id}
@@ -93,7 +94,7 @@ class Sidebar extends React.Component {
                 <MenuList>
                     <li>
                         <MenuLink
-                            className={!Object.keys(this.props.filters).length ? 'is-active': ''}
+                            className={Object.keys(this.props.filters).length <= 1 ? 'is-active': ''}
                             onClick={this.props.clearFilters}
                         >
                             All

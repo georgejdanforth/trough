@@ -7,6 +7,7 @@ import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 import './Feed.css';
 
 import FeedItem from './FeedItem';
+import Spinner from '../shared/Spinner';
 import { decrementPage, incrementPage } from '../../actions/filters';
 import { updateFeed, finishUpdateFeed } from '../../actions/updates';
 import { getFeedItems } from '../../utils/http';
@@ -71,9 +72,14 @@ class Feed extends React.Component {
             : this.state.feedItems.map(feedItem => <FeedItem key={feedItem.id} {...feedItem}/>);
 
     render() {
+
+        if (this.state.feedItems === null) {
+            return <Spinner size={3} color={'gray'}/>;
+        }
+
         return (
             <Container className='feed-container'>
-                { this.state.feedItems === null ? 'Loading...' : this.renderFeedItems() }
+                { this.renderFeedItems() }
                 <div className={'page-buttons'}>
                     <Button
                         className={'page-button'}
